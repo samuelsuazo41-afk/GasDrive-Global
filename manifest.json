@@ -1,1 +1,41 @@
-
+{
+  "name": "GasDrive DGT España V8.8.1",
+  "short_name": "GasDrive ES",
+  "description": "630 Preguntas DGT 2026. Señales CBG con SVG. Modo offline. 100% Gratis.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#00D9FF",
+  "background_color": "#0a0a0a",
+  "lang": "es-ES",
+  "categories": ["education", "utilities"],
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "monochrome"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "screenshot-mobile.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ]
+}
