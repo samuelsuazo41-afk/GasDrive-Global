@@ -1,4 +1,4 @@
-const CACHE = 'gasdrive-v9.5.11'; // Sube versión cada update para forzar caché
+const CACHE = 'gasdrive-v9.5.12'; // Sube versión cada update para forzar caché
 const FILES = [
   './',
   './index.html',
@@ -10,15 +10,15 @@ const FILES = [
 
   // ============================================
   // BLOQUE 1: DATA - Preguntas + SVG CBG
-  // Nombres exactos como están en raíz ahora
+  // RUTAS CORREGIDAS CON /data/
   // ============================================
-  './preguntas_senales.js',
-  './preguntas_normas.js', 
-  './preguntas_mecanica.js',
-  './preguntas_auxilios.js',
-  './preguntas_medioambiente.js',
-  './preguntas_situaciones.js',
-  './senales_svg.js',
+  './data/preguntas_senales.js',
+  './data/preguntas_normas.js', 
+  './data/preguntas_mecanica.js',
+  './data/preguntas_auxilios.js',
+  './data/preguntas_medioambiente.js',
+  './data/preguntas_situaciones.js',
+  './data/senales_svg.js',
 
   // ============================================
   // PDFs Temario - 5 archivos completos
