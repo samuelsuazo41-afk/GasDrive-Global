@@ -6,7 +6,7 @@
 <title>GasDrive DGT ES V8.5</title>
 <link rel="manifest" href="./manifest.json">
 <style>
-html, body { background: #0a0a0a; color: #fff; margin: 0; padding: 0; }
+html, body { background: #0a0a0a; color: #fff; margin: 0; padding: 0; font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; }
 .header{background:linear-gradient(180deg,#2a2a2a 0%,#0a0a0a 100%);padding:14px 20px 18px;text-align:center;border-bottom:1px solid #333;position:sticky;top:0;z-index:50}
 h1{font-size:24px;font-weight:900;letter-spacing:1.5px;margin-bottom:3px}
 .subtitle{font-size:11px;opacity:0.9;margin-top:2px;display:flex;align-items:center;justify-content:center;gap:6px}
@@ -42,32 +42,20 @@ h1{font-size:24px;font-weight:900;letter-spacing:1.5px;margin-bottom:3px}
 .feedback.acierto{background:#0a4;color:#fff}
 .feedback.fallo{background:#a00;color:#fff}
 @keyframes bounceIn{0%{transform:scale(0)}50%{transform:scale(1.2)}100%{transform:scale(1)}}
-.garage-car{background:#1a1a1a;border:2px solid #333;border-radius:11px;padding:18px;text-align:center;margin:9px 0}
-.garage-car.locked{opacity:0.4}
-.garage-car h3{color:#00D9FF;margin:7px 0}
-.score-big{text-align:center;font-size:44px;font-weight:900;color:#00D9FF;margin:18px 0;text-shadow:0 0 20px rgba(0,217,255,0.5)}
-.emoji-shop{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:8px}
-.emoji-item{background:#1a1a1a;border:2px solid #333;border-radius:11px;padding:13px;text-align:center;cursor:pointer}
-.emoji-item.locked{opacity:0.4}
-.tip{background:#1a1a1a;border-left:4px solid #00D9FF;padding:12px;margin:9px 0;border-radius:6px;display:flex;align-items:center}
-.tip-emoji{font-size:22px;margin-right:10px}
 .progress-bar{background:#222;height:7px;border-radius:3px;margin:7px 0;overflow:hidden}
 .progress-fill{background:linear-gradient(90deg,#00D9FF,#0f5);height:100%;transition:width 0.3s}
 .btn{background:#00D9FF;color:#000;border:none;padding:11px 18px;border-radius:7px;font-weight:700;cursor:pointer;margin:4px}
 .btn-buy{background:linear-gradient(135deg,#00D9FF 0%,#00ff88 100%);color:#000;border:none;padding:7px 11px;border-radius:7px;font-weight:700;font-size:12px;margin-top:7px;cursor:pointer}
-.btn-buy:active{transform:scale(0.95)}
+.emoji-shop{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:8px}
+.emoji-item{background:#1a1a1a;border:2px solid #333;border-radius:11px;padding:13px;text-align:center;cursor:pointer}
+.emoji-item.locked{opacity:0.4}
+.garage-car{background:#1a1a1a;border:2px solid #333;border-radius:11px;padding:18px;text-align:center;margin:9px 0}
+.score-big{text-align:center;font-size:44px;font-weight:900;color:#00D9FF;margin:18px 0}
+.tip{background:#1a1a1a;border-left:4px solid #00D9FF;padding:12px;margin:9px 0;border-radius:6px;display:flex;align-items:center}
+.tip-emoji{font-size:22px;margin-right:10px}
 #temario-lista{ display:grid; grid-template-columns:repeat(2,160px); gap:12px; justify-content:center; margin:14px auto 0; }
 .temario-item{ background:#1a1a1a; border:2px solid #00D9FF; border-radius:12px; padding:16px 10px; text-align:center; cursor:pointer; transition:0.2s; min-height:110px; display:flex; flex-direction:column; justify-content:center; }
 .temario-item:active{ transform:scale(0.96); background:#222; }
-.temario-item.locked{ border-color:#444; opacity:0.4; cursor:not-allowed; }
-.temario-item div:nth-child(2){ font-size:14px; font-weight:700; margin:8px 0 4px; }
-body.menu-open{ overflow:hidden; position:fixed; width:100%; height:100%; }
-.side-menu{ position:fixed; top:0; right:0; width:85%; max-width:320px; height:100vh; background:#0a0a0a; z-index:200; overflow-y:auto; overflow-x:hidden; -webkit-overflow-scrolling:touch; transform:translateX(100%); transition:transform 0.3s ease; }
-.side-menu.active{ transform:translateX(0); }
-.menu-overlay{ position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:199; opacity:0; pointer-events:none; transition:opacity 0.3s ease; }
-.menu-overlay.active{ opacity:1; pointer-events:all; }
-
-/* CAJA DE IMAGEN SVG */
 #test-senales-imagen {
   text-align: center;
   margin: 22px auto 16px auto;
@@ -78,29 +66,63 @@ body.menu-open{ overflow:hidden; position:fixed; width:100%; height:100%; }
   border: 2px solid #2f2f2f;
   border-radius: 18px;
   display: none;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.6);
-  transition: all 0.3s ease;
 }
-#test-senales-imagen:not(:empty) {
-  display: block;
-  animation: fadeIn 0.3s;
-}
-#test-senales-imagen svg {
-  max-width: 100%;
-  max-height: 190px;
-  width: auto;
-  height: auto;
-  display: block;
-  margin: 0 auto;
-  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.4));
-}
+#test-senales-imagen:not(:empty) { display: block; }
+#test-senales-imagen svg { max-width: 100%; max-height: 190px; display: block; margin: 0 auto; }
 </style>
 
 <script>
+// === TOKUMASTER v2.0 - ERRORES + DATOS + PROMESAS EN 1 CAJA ===
+(function() {
+  const log = [];
+  function show() {
+    let div = document.getElementById('toku-box');
+    if(!div) {
+      div = document.createElement('div');
+      div.id = 'toku-box';
+      div.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:#0a0a0a;color:#0f0;padding:8px;z-index:9999;font-size:11px;max-height:180px;overflow:auto;border-top:2px solid #00D9FF;font-family:monospace';
+      document.body.appendChild(div);
+    }
+    div.innerHTML = log.slice(-12).join('<br>');
+  }
+
+  // Errores JS - ROJO
+  window.onerror = (msg, url, line) => {
+    log.push('❌ <span style="color:#ff5555">' + msg + ' L' + line + '</span>');
+    show();
+    return false;
+  };
+
+  // Promesas rotas - NARANJA
+  window.addEventListener('unhandledrejection', e => {
+    log.push('⚠️ <span style="color:#ffaa00">Promise: ' + e.reason + '</span>');
+    show();
+  });
+
+  // Debug datos cada 3 seg - VERDE
+  setInterval(() => {
+    const s = window.preguntas_senales?.length || 0;
+    const n = window.preguntas_normas?.length || 0;
+    const m = window.preguntas_mecanica?.length || 0;
+    const a = window.preguntas_auxilios?.length || 0;
+    const me = window.preguntas_medioambiente?.length || 0;
+    const svg = typeof window.senales_svg;
+    log.push(`✅ <span style="color:#55ff55">sen:${s} norm:${n} mec:${m} aux:${a} med:${me} svg:${svg}</span>`);
+    show();
+  }, 3000);
+
+  // Al cargar - INFO AZUL
+  window.addEventListener('load', () => {
+    log.push('🚀 <span style="color:#55aaff">App cargada - Esperando datos...</span>');
+    show();
+  });
+})();
+
 // === STUBS INLINE PARA EVITAR ReferenceError ===
 let preguntaActual = null;
 let categoriaActual = 'senales';
 let sitCategoriaActiva = 'clima';
+let stats = {aciertos:0, racha:0, score:0};
 
 function cambiarTab(e, tab) {
   document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
@@ -127,15 +149,23 @@ function cambiarSubTab(e, tab, subtab) {
   if(tab === 'sit') cargarSituacion(subtab);
 }
 
-// STUBS BÁSICOS - apps.js los sobreescribe cuando cargue
 function cargarPregunta(cat) {
   categoriaActual = cat;
+  stats = {aciertos:0, racha:0, score:0};
+  actualizarStats(cat);
+
   const data = window['preguntas_' + cat];
   if(!data ||!data.length) {
-    document.getElementById(`test-${cat}-pregunta`).textContent = 'Error: No hay datos';
+    document.getElementById(`test-${cat}-pregunta`).textContent = 'Error: No hay datos en preguntas_' + cat;
     return;
   }
+  nuevaPregunta(cat);
+}
+
+function nuevaPregunta(cat) {
+  const data = window['preguntas_' + cat];
   preguntaActual = data[Math.floor(Math.random() * data.length)];
+
   document.getElementById(`test-${cat}-pregunta`).textContent = preguntaActual.pregunta;
 
   const opcionesDiv = document.getElementById(`test-${cat}-opciones`);
@@ -148,7 +178,6 @@ function cargarPregunta(cat) {
     opcionesDiv.appendChild(div);
   });
 
-  // Mostrar SVG si hay
   const imgDiv = document.getElementById(`test-${cat}-imagen`);
   if(cat === 'senales' && preguntaActual.imagen && window.senales_svg) {
     imgDiv.innerHTML = window.senales_svg[preguntaActual.imagen] || '';
@@ -159,29 +188,56 @@ function cargarPregunta(cat) {
 
   document.getElementById(`btn-sig-test-${cat}`).disabled = true;
   document.getElementById(`test-${cat}-feedback`).textContent = '';
+  document.getElementById(`test-${cat}-feedback`).className = 'feedback';
 }
 
 function seleccionarRespuesta(idx, correcta, cat) {
+  // Selector corregido con espacio
   document.querySelectorAll(`#test-${cat}-opciones.opcio`).forEach((op, i) => {
     op.classList.add('bloquejada');
     if(i === correcta) op.classList.add('correcta');
     if(i === idx && i!== correcta) op.classList.add('incorrecta');
   });
+
   const fb = document.getElementById(`test-${cat}-feedback`);
-  fb.textContent = idx === correcta? '✓ Acierto!' : '✗ Fallo';
-  fb.className = 'feedback ' + (idx === correcta? 'acierto' : 'fallo');
+  if(idx === correcta) {
+    fb.textContent = '✓ ACIERTO';
+    fb.className = 'feedback acierto';
+    stats.aciertos++;
+    stats.racha++;
+    stats.score += 10 * stats.racha;
+  } else {
+    fb.textContent = '✗ FALLO';
+    fb.className = 'feedback fallo';
+    stats.racha = 0;
+  }
+
+  actualizarStats(cat);
   document.getElementById(`btn-sig-test-${cat}`).disabled = false;
 }
 
+function actualizarStats(cat) {
+  document.getElementById(`test-${cat}-aciertos`).textContent = stats.aciertos;
+  document.getElementById(`test-${cat}-racha`).textContent = stats.racha;
+  document.getElementById(`test-${cat}-score`).textContent = stats.score;
+  const progress = Math.min((stats.aciertos/5)*100, 100);
+  document.getElementById(`test-${cat}-progress`).style.width = progress + '%';
+}
+
 function siguienteTest(e, cat) {
-  cargarPregunta(cat);
+  if(stats.aciertos >= 5) {
+    alert('¡Test completado! Score: ' + stats.score);
+    cargarPregunta(cat);
+    return;
+  }
+  nuevaPregunta(cat);
 }
 
 function cargarSituacion(cat) {
   sitCategoriaActiva = cat;
   const data = window.preguntas_situaciones;
   if(!data ||!data[cat] ||!data[cat].length) {
-    document.getElementById(`sit-${cat}-pregunta`).textContent = 'Error: No hay datos';
+    document.getElementById(`sit-${cat}-pregunta`).textContent = 'Situación ' + cat + ' - datos cargando...';
     return;
   }
   const sit = data[cat][Math.floor(Math.random() * data[cat].length)];
@@ -209,23 +265,30 @@ function siguienteSituacion(e, cat) {
 }
 
 function cargarGaraje() {
-  document.getElementById('garage-lista').innerHTML = '<p style="text-align:center;color:#666">Garaje cargando...</p>';
+  document.getElementById('garage-lista').innerHTML = '<div class="garage-car"><h3>Seat Ibiza 90CV</h3><p>Tu coche inicial</p></div>';
 }
 
 function cargarTienda() {
-  document.getElementById('emoji-tienda').innerHTML = '<p style="text-align:center;color:#666">Tienda cargando...</p>';
+  document.getElementById('emoji-tienda').innerHTML = '<div class="emoji-item"><div>🏎️</div><div>Ferrari F40</div><button class="btn-buy">500 pts</button></div>';
 }
 
 function cargarTips() {
   document.getElementById('tip-content').innerHTML = '<div class="tip"><div class="tip-emoji">💡</div><div>Mantén distancia de seguridad: 2 segundos</div></div>';
 }
 
+function nextTip(e) { cargarTips(); }
+function prevTip(e) { cargarTips(); }
+
 function cargarTemario() {
-  document.getElementById('temario-lista').innerHTML = '<div class="temario-item"><div>📋</div><div>Normas</div></div><div class="temario-item"><div>🚦</div><div>Señales</div></div>';
+  document.getElementById('temario-lista').innerHTML =
+    '<div class="temario-item"><div>📋</div><div>Normas</div></div>' +
+    '<div class="temario-item"><div>🚦</div><div>Señales</div></div>' +
+    '<div class="temario-item"><div>⚙️</div><div>Mecánica</div></div>' +
+    '<div class="temario-item"><div>🚑</div><div>Auxilios</div></div>';
 }
 
 function iniciarExamen(e) {
-  alert('Examen iniciado - lógica completa en apps.js');
+  alert('Examen 30 preguntas - lógica completa en apps.js');
 }
 </script>
 </head>
@@ -233,7 +296,7 @@ function iniciarExamen(e) {
 <div class="header">
   <h1>🚘 GasDrive DGT ES</h1>
   <div class="subtitle">630 Preguntas DGT. Offline<span class="coins" id="coins">💰 0</span></div>
-  <div id="motivacion" style="margin-top:8px;font-size:13px;color:#FFD700"></div>
+  <div id="motivacion">Cargando datos...</div>
 </div>
 
 <div id="tab-test" class="tab-content active">
@@ -250,7 +313,7 @@ function iniciarExamen(e) {
       <h2>🚦 SEÑALES DE TRÁFICO</h2>
       <div class="stats"><div>Aciertos: <span id="test-senales-aciertos">0</span>/5</div><div>Racha: <span id="test-senales-racha">0</span>🔥</div><div>Score: <span id="test-senales-score">0</span></div></div>
       <div class="progress-bar"><div class="progress-fill" id="test-senales-progress"></div></div>
-      <div id="test-senales-imagen" style="text-align:center;margin:15px 0;display:none"></div>
+      <div id="test-senales-imagen"></div>
       <div class="pregunta" id="test-senales-pregunta">Cargando...</div>
       <div id="test-senales-opciones"></div>
       <div class="feedback" id="test-senales-feedback"></div>
@@ -318,91 +381,21 @@ function iniciarExamen(e) {
     <button class="sub-tab-btn" onclick="cambiarSubTab(event,'sit','carretera')">🛣️ Carretera</button>
     <button class="sub-tab-btn" onclick="cambiarSubTab(event,'sit','emergencia')">🚨 Emergencia</button>
   </div>
-  <div id="sit-clima" class="sub-content active">
-    <div class="card">
-      <h2 id="sit-titulo">🌧️ CASOS REALES - CLIMA ADVERSO</h2>
-      <div class="stats"><div>Resueltas: <span id="sit-clima-aciertos">0</span>/20</div><div>Score: <span id="sit-clima-score">0</span></div></div>
-      <div class="progress-bar"><div class="progress-fill" id="sit-clima-progress"></div></div>
-      <div class="pregunta" id="sit-clima-pregunta"></div>
-      <div id="sit-clima-opciones"></div>
-      <div class="feedback" id="sit-clima-feedback"></div>
-      <button class="btn-sig" id="btn-sig-sit-clima" onclick="siguienteSituacion(event,'clima')" disabled>SIGUIENTE</button>
-    </div>
-  </div>
-  <div id="sit-urbano" class="sub-content">
-    <div class="card">
-      <h2>🏙️ CASOS REALES - URBANO</h2>
-      <div class="stats"><div>Resueltas: <span id="sit-urbano-aciertos">0</span>/20</div><div>Score: <span id="sit-urbano-score">0</span></div></div>
-      <div class="progress-bar"><div class="progress-fill" id="sit-urbano-progress"></div></div>
-      <div class="pregunta" id="sit-urbano-pregunta"></div>
-      <div id="sit-urbano-opciones"></div>
-      <div class="feedback" id="sit-urbano-feedback"></div>
-      <button class="btn-sig" id="btn-sig-sit-urbano" onclick="siguienteSituacion(event,'urbano')" disabled>SIGUIENTE</button>
-    </div>
-  </div>
-  <div id="sit-carretera" class="sub-content">
-    <div class="card">
-      <h2>🛣️ CASOS REALES - CARRETERA</h2>
-      <div class="stats"><div>Resueltas: <span id="sit-carretera-aciertos">0</span>/20</div><div>Score: <span id="sit-carretera-score">0</span></div></div>
-      <div class="progress-bar"><div class="progress-fill" id="sit-carretera-progress"></div></div>
-      <div class="pregunta" id="sit-carretera-pregunta"></div>
-      <div id="sit-carretera-opciones"></div>
-      <div class="feedback" id="sit-carretera-feedback"></div>
-      <button class="btn-sig" id="btn-sig-sit-carretera" onclick="siguienteSituacion(event,'carretera')" disabled>SIGUIENTE</button>
-    </div>
-  </div>
-  <div id="sit-emergencia" class="sub-content">
-    <div class="card">
-      <h2>🚨 CASOS REALES - EMERGENCIA</h2>
-      <div class="stats"><div>Resueltas: <span id="sit-emergencia-aciertos">0</span>/20</div><div>Score: <span id="sit-emergencia-score">0</span></div></div>
-      <div class="progress-bar"><div class="progress-fill" id="sit-emergencia-progress"></div></div>
-      <div class="pregunta" id="sit-emergencia-pregunta"></div>
-      <div id="sit-emergencia-opciones"></div>
-      <div class="feedback" id="sit-emergencia-feedback"></div>
-      <button class="btn-sig" id="btn-sig-sit-emergencia" onclick="siguienteSituacion(event,'emergencia')" disabled>SIGUIENTE</button>
-    </div>
-  </div>
+  <div id="sit-clima" class="sub-content active"><div class="card"><h2>🌧️ CASOS REALES - CLIMA</h2><div class="stats"><div>Resueltas: <span id="sit-clima-aciertos">0</span>/20</div><div>Score: <span id="sit-clima-score">0</span></div></div><div class="progress-bar"><div class="progress-fill" id="sit-clima-progress"></div></div><div class="pregunta" id="sit-clima-pregunta"></div><div id="sit-clima-opciones"></div><div class="feedback" id="sit-clima-feedback"></div><button class="btn-sig" id="btn-sig-sit-clima" onclick="siguienteSituacion(event,'clima')" disabled>SIGUIENTE</button></div></div>
+  <div id="sit-urbano" class="sub-content"><div class="card"><h2>🏙️ CASOS REALES - URBANO</h2><div class="stats"><div>Resueltas: <span id="sit-urbano-aciertos">0</span>/20</div><div>Score: <span id="sit-urbano-score">0</span></div></div><div class="progress-bar"><div class="progress-fill" id="sit-urbano-progress"></div></div><div class="pregunta" id="sit-urbano-pregunta"></div><div id="sit-urbano-opciones"></div><div class="feedback" id="sit-urbano-feedback"></div><button class="btn-sig" id="btn-sig-sit-urbano" onclick="siguienteSituacion(event,'urbano')" disabled>SIGUIENTE</button></div></div>
+  <div id="sit-carretera" class="sub-content"><div class="card"><h2>🛣️ CASOS REALES - CARRETERA</h2><div class="stats"><div>Resueltas: <span id="sit-carretera-aciertos">0</span>/20</div><div>Score: <span id="sit-carretera-score">0</span></div></div><div class="progress-bar"><div class="progress-fill" id="sit-carretera-progress"></div></div><div class="pregunta" id="sit-carretera-pregunta"></div><div id="sit-carretera-opciones"></div><div class="feedback" id="sit-carretera-feedback"></div><button class="btn-sig" id="btn-sig-sit-carretera" onclick="siguienteSituacion(event,'carretera')" disabled>SIGUIENTE</button></div></div>
+  <div id="sit-emergencia" class="sub-content"><div class="card"><h2>🚨 CASOS REALES - EMERGENCIA</h2><div class="stats"><div>Resueltas: <span id="sit-emergencia-aciertos">0</span>/20</div><div>Score: <span id="sit-emergencia-score">0</span></div></div><div class="progress-bar"><div class="progress-fill" id="sit-emergencia-progress"></div></div><div class="pregunta" id="sit-emergencia-pregunta"></div><div id="sit-emergencia-opciones"></div><div class="feedback" id="sit-emergencia-feedback"></div><button class="btn-sig" id="btn-sig-sit-emergencia" onclick="siguienteSituacion(event,'emergencia')" disabled>SIGUIENTE</button></div></div>
 </div>
 
-<div id="tab-examen" class="tab-content">
-  <div class="card">
-    <h2>📋 EXAMEN OFICIAL 30 PREGUNTAS</h2>
-    <div class="stats"><div>Pregunta: <span id="examen-num">0</span>/30</div><div>Aciertos: <span id="examen-aciertos">0</span></div><div>Tiempo: <span id="examen-timer">30:00</span></div></div>
-    <div class="progress-bar"><div class="progress-fill" id="examen-progress"></div></div>
-    <div class="pregunta" id="examen-pregunta">Pulsa Iniciar Examen</div>
-    <div id="examen-imagen" style="text-align:center;margin:15px 0;display:none"></div>
-    <div id="examen-opciones"></div>
-    <button class="btn-sig" id="btn-iniciar-examen" onclick="iniciarExamen(event)">INICIAR EXAMEN</button>
-    <button class="btn-sig" id="btn-sig-examen" onclick="siguientePreguntaExamen(event)" style="display:none" disabled>SIGUIENTE</button>
-    <div id="examen-resultado" style="display:none;text-align:center;margin-top:20px"></div>
-  </div>
-</div>
+<div id="tab-examen" class="tab-content"><div class="card"><h2>📋 EXAMEN OFICIAL 30 PREGUNTAS</h2><div class="stats"><div>Pregunta: <span id="examen-num">0</span>/30</div><div>Aciertos: <span id="examen-aciertos">0</span></div><div>Tiempo: <span id="examen-timer">30:00</span></div></div><div class="progress-bar"><div class="progress-fill" id="examen-progress"></div></div><div class="pregunta" id="examen-pregunta">Pulsa Iniciar Examen</div><div id="examen-imagen" style="display:none"></div><div id="examen-opciones"></div><button class="btn-sig" id="btn-iniciar-examen" onclick="iniciarExamen(event)">INICIAR EXAMEN</button></div></div>
 
-<div id="tab-garage" class="tab-content">
-  <div class="card"><h2>🏁 TU GARAJE</h2><div class="score-big" id="garage-score">🏎️ 90 CV</div><div id="garage-lista"></div></div>
-</div>
+<div id="tab-garage" class="tab-content"><div class="card"><h2>🏁 TU GARAJE</h2><div class="score-big" id="garage-score">🏎️ 90 CV</div><div id="garage-lista"></div></div></div>
 
-<div id="tab-tienda" class="tab-content">
-  <div class="card"><h2>🛒 TIENDA</h2><p style="margin-bottom:12px;font-size:13px;color:#999">Cambia tus puntos por coches y accesorios</p><div class="emoji-shop" id="emoji-tienda"></div></div>
-</div>
+<div id="tab-tienda" class="tab-content"><div class="card"><h2>🛒 TIENDA</h2><p style="margin-bottom:12px;font-size:13px;color:#999">Cambia tus puntos por coches y accesorios</p><div class="emoji-shop" id="emoji-tienda"></div></div></div>
 
-<div id="tab-tips" class="tab-content">
-  <div class="card"><h2>💡 CONSEJO DGT</h2><div id="tip-content"></div>
-    <div style="display:flex;gap:10px;margin-top:15px">
-      <button class="btn" style="flex:1" onclick="prevTip(event)">ANTERIOR</button>
-      <span id="tip-counter" style="align-self:center">1/100</span>
-      <button class="btn" style="flex:1" onclick="nextTip(event)">SIGUIENTE</button>
-    </div>
-  </div>
-</div>
+<div id="tab-tips" class="tab-content"><div class="card"><h2>💡 CONSEJO DGT</h2><div id="tip-content"></div><div style="display:flex;gap:10px;margin-top:15px"><button class="btn" style="flex:1" onclick="prevTip(event)">ANTERIOR</button><span id="tip-counter" style="align-self:center">1/5</span><button class="btn" style="flex:1" onclick="nextTip(event)">SIGUIENTE</button></div></div></div>
 
-<div id="tab-temario" class="tab-content">
-  <div class="card">
-    <h2>📖 TEMARIOS OFICIALES</h2>
-    <p style="margin-bottom:12px;font-size:13px;color:#999">Estudia los temarios completos DGT</p>
-    <div id="temario-lista"></div>
-  </div>
-</div>
+<div id="tab-temario" class="tab-content"><div class="card"><h2>📖 TEMARIOS OFICIALES</h2><p style="margin-bottom:12px;font-size:13px;color:#999">Estudia los temarios completos DGT</p><div id="temario-lista"></div></div></div>
 
 <div class="tabs">
   <button class="tab-btn active" onclick="cambiarTab(event,'test')"><span class="emoji">📝</span>TEST</button>
@@ -414,7 +407,6 @@ function iniciarExamen(e) {
   <button class="tab-btn" onclick="cambiarTab(event,'temario')"><span class="emoji">📖</span>TEMARIO</button>
 </div>
 
-<!-- DATOS DE PREGUNTAS -->
 <script src="./data/preguntas_senales.js" defer></script>
 <script src="./data/preguntas_normas.js" defer></script>
 <script src="./data/preguntas_mecanica.js" defer></script>
@@ -422,42 +414,10 @@ function iniciarExamen(e) {
 <script src="./data/preguntas_medioambiente.js" defer></script>
 <script src="./data/preguntas_situaciones.js" defer></script>
 <script src="./data/senales_svg.js" defer></script>
+<script src="./apps.js?v=8.8.6" defer></script>
 
-<!-- LÓGICA PRINCIPAL - SOBREScribe los stubs de arriba -->
-<script src="./apps.js?v=8.8.3" defer></script>
-
-<!-- REGISTRO SW -->
 <script>
-if('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js');
-}
-</script>
-
-<!-- DEBUG -->
-<script>
-window.onerror = function(msg, url, line) {
-  const div = document.createElement('div');
-  div.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:#ff4444;color:white;padding:8px;z-index:9999;font-size:12px;max-height:150px;overflow:auto';
-  div.innerHTML = 'ERROR: ' + msg + ' línea ' + line;
-  document.body.appendChild(div);
-  return false;
-};
-
-window.addEventListener('load', () => {
-  setTimeout(() => {
-    const info = [
-      'senales: ' + typeof window.preguntas_senales + ' len=' + window.preguntas_senales?.length,
-      'normas: ' + typeof window.preguntas_normas + ' len=' + window.preguntas_normas?.length,
-      'medio: ' + typeof window.preguntas_medioambiente + ' len=' + window.preguntas_medioambiente?.length,
-      'svg: ' + typeof window.senales_svg
-    ].join(' | ');
-
-    const div = document.createElement('div');
-    div.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#222;color:#0f0;padding:6px;z-index:9999;font-size:10px;max-height:120px;overflow:auto';
-    div.textContent = info;
-    document.body.appendChild(div);
-  }, 2000);
-});
+if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js');
 </script>
 </body>
 </html>
