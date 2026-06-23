@@ -67,10 +67,7 @@ body.menu-open{ overflow:hidden; position:fixed; width:100%; height:100%; }
 .menu-overlay{ position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:199; opacity:0; pointer-events:none; transition:opacity 0.3s ease; }
 .menu-overlay.active{ opacity:1; pointer-events:all; }
 
-/* ========================================
-   CAJA DE IMAGEN SVG - SOLO TEST SEÑALES
-   CBG V8.8.1 RD 465/2025 - AÑADIDO FINAL
-   ======================================== */
+/* CAJA DE IMAGEN SVG - SOLO TEST SEÑALES */
 #test-senales-imagen {
   text-align: center;
   margin: 22px auto 16px auto;
@@ -100,6 +97,34 @@ body.menu-open{ overflow:hidden; position:fixed; width:100%; height:100%; }
   filter: drop-shadow(0 2px 6px rgba(0,0,0,0.4));
 }
 </style>
+
+<script>
+// FUNCIONES INLINE PARA EVITAR ReferenceError CON DEFER
+function cambiarTab(e, tab) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  e.target.closest('.tab-btn').classList.add('active');
+
+  if(tab === 'garage') cargarGaraje();
+  if(tab === 'tienda') cargarTienda();
+  if(tab === 'tips') cargarTips();
+  if(tab === 'temario') cargarTemario();
+  if(tab === 'test') cargarPregunta('senales');
+  if(tab === 'situaciones') cargarSituacion(sitCategoriaActiva);
+}
+
+function cambiarSubTab(e, tab, subtab) {
+  const tabId = tab === 'sit'? 'situaciones' : tab;
+  const contenedor = document.getElementById('tab-' + tabId);
+  contenedor.querySelectorAll('.sub-tab-btn').forEach(b => b.classList.remove('active'));
+  contenedor.querySelectorAll('.sub-content').forEach(c => c.classList.remove('active'));
+  e.target.classList.add('active');
+  document.getElementById(`${tab === 'test'? 'test' : 'sit'}-${subtab}`).classList.add('active');
+  if(tab === 'test') cargarPregunta(subtab);
+  if(tab === 'sit') cargarSituacion(subtab);
+}
+</script>
 </head>
 <body>
 <div class="header">
@@ -114,7 +139,7 @@ body.menu-open{ overflow:hidden; position:fixed; width:100%; height:100%; }
     <button class="sub-tab-btn" onclick="cambiarSubTab(event,'test','normas')">📋 Normas</button>
     <button class="sub-tab-btn" onclick="cambiarSubTab(event,'test','mecanica')">⚙️ Mecánica</button>
     <button class="sub-tab-btn" onclick="cambiarSubTab(event,'test','auxilios')">🚑 Auxilios</button>
-    <button class="sub-tab-btn" onclick="cambiarSubTab(event,'test','mediambiente')">♻️ MedioAmb</button>
+    <button class="sub-tab-btn" onclick="cambiarSubTab(event,'test','medioambiente')">♻️ MedioAmb</button>
   </div>
 
   <div id="test-senales" class="sub-content active">
@@ -169,16 +194,16 @@ body.menu-open{ overflow:hidden; position:fixed; width:100%; height:100%; }
     </div>
   </div>
 
-  <div id="test-mediambiente" class="sub-content">
+  <div id="test-medioambiente" class="sub-content">
     <div class="card">
       <h2>♻️ MEDIO AMBIENTE</h2>
-      <div class="stats"><div>Aciertos: <span id="test-mediambiente-aciertos">0</span>/5</div><div>Racha: <span id="test-mediambiente-racha">0</span>🔥</div><div>Score: <span id="test-mediambiente-score">0</span></div></div>
-      <div class="progress-bar"><div class="progress-fill" id="test-mediambiente-progress"></div></div>
-      <div id="test-mediambiente-imagen" style="display:none"></div>
-      <div class="pregunta" id="test-mediambiente-pregunta"></div>
-      <div id="test-mediambiente-opciones"></div>
-      <div class="feedback" id="test-mediambiente-feedback"></div>
-      <button class="btn-sig" id="btn-sig-test-mediambiente" onclick="siguienteTest(event,'mediambiente')" disabled>SIGUIENTE</button>
+      <div class="stats"><div>Aciertos: <span id="test-medioambiente-aciertos">0</span>/5</div><div>Racha: <span id="test-medioambiente-racha">0</span>🔥</div><div>Score: <span id="test-medioambiente-score">0</span></div></div>
+      <div class="progress-bar"><div class="progress-fill" id="test-medioambiente-progress"></div></div>
+      <div id="test-medioambiente-imagen" style="display:none"></div>
+      <div class="pregunta" id="test-medioambiente-pregunta"></div>
+      <div id="test-medioambiente-opciones"></div>
+      <div class="feedback" id="test-medioambiente-feedback"></div>
+      <button class="btn-sig" id="btn-sig-test-medioambiente" onclick="siguienteTest(event,'medioambiente')" disabled>SIGUIENTE</button>
     </div>
   </div>
 </div>
@@ -286,28 +311,26 @@ body.menu-open{ overflow:hidden; position:fixed; width:100%; height:100%; }
   <button class="tab-btn" onclick="cambiarTab(event,'temario')"><span class="emoji">📖</span>TEMARIO</button>
 </div>
 
-<!-- 1. DATOS DE PREGUNTAS - TODOS EN /data/ -->
+<!-- DATOS DE PREGUNTAS -->
 <script src="./data/preguntas_senales.js" defer></script>
 <script src="./data/preguntas_normas.js" defer></script>
 <script src="./data/preguntas_mecanica.js" defer></script>
 <script src="./data/preguntas_auxilios.js" defer></script>
 <script src="./data/preguntas_medioambiente.js" defer></script>
 <script src="./data/preguntas_situaciones.js" defer></script>
-
-<!-- 2. DATOS SVG SEÑALES CBG V8.8.2 -->
 <script src="./data/senales_svg.js" defer></script>
 
-<!-- 3. LÓGICA PRINCIPAL - VA LA ÚLTIMA -->
+<!-- LÓGICA PRINCIPAL -->
 <script src="./apps.js?v=8.8.2" defer></script>
 
-<!-- 4. REGISTRO SW -->
+<!-- REGISTRO SW -->
 <script>
 if('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./sw.js');
 }
 </script>
 
-<!-- 5. DEBUG MÓVIL - TOKU CONSOLA - BORRAR CUANDO FUNCIONE -->
+<!-- DEBUG -->
 <script>
 window.onerror = function(msg, url, line) {
   const div = document.createElement('div');
@@ -320,10 +343,10 @@ window.onerror = function(msg, url, line) {
 window.addEventListener('load', () => {
   setTimeout(() => {
     const info = [
-      'senales: ' + typeof preguntas_senales + ' len=' + preguntas_senales?.length,
-      'normas: ' + typeof preguntas_normas + ' len=' + preguntas_normas?.length,
-      'medio: ' + typeof preguntas_medioambiente + ' len=' + preguntas_medioambiente?.length,
-      'svg: ' + typeof senales_svg
+      'senales: ' + typeof window.preguntas_senales + ' len=' + window.preguntas_senales?.length,
+      'normas: ' + typeof window.preguntas_normas + ' len=' + window.preguntas_normas?.length,
+      'medio: ' + typeof window.preguntas_medioambiente + ' len=' + window.preguntas_medioambiente?.length,
+      'svg: ' + typeof window.senales_svg
     ].join(' | ');
     
     const div = document.createElement('div');
