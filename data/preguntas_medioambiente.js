@@ -1,5 +1,5 @@
 // 160 CASOS REALES DE CONDUCCIÓN RD 465/2025
-window.preguntas_situaciones = [
+window.preguntas_medioambiente = [
   clima: [
     {q:"Lluvia intensa: ¿qué haces?",a:["Acelero para salir","Reduzco velocidad y aumento distancia","Freno en seco"],ok:1},
     {q:"Niebla espesa:",a:["Luces largas","Antiniebla + cortas","Sin luces"],ok:1},
