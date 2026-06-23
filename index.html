@@ -286,24 +286,24 @@ body.menu-open{ overflow:hidden; position:fixed; width:100%; height:100%; }
   <button class="tab-btn" onclick="cambiarTab(event,'temario')"><span class="emoji">📖</span>TEMARIO</button>
 </div>
 
-<!-- 1. DATOS DE PREGUNTAS -->
-<script src="./preguntas_senales.js"></script>
-<script src="./preguntas_normas.js"></script>
-<script src="./preguntas_mecanica.js"></script>
-<script src="./preguntas_auxilios.js"></script>
-<script src="./preguntas_mediambiente.js"></script>
-<script src="./preguntas_situaciones.js"></script>
+<!-- 1. DATOS DE PREGUNTAS - TODOS EN /data/ -->
+<script src="./data/preguntas_senales.js" defer></script>
+<script src="./data/preguntas_normas.js" defer></script>
+<script src="./data/preguntas_mecanica.js" defer></script>
+<script src="./data/preguntas_auxilios.js" defer></script>
+<script src="./data/preguntas_medioambiente.js" defer></script>
+<script src="./data/preguntas_situaciones.js" defer></script>
 
-<!-- 2. DATOS SVG SEÑALES CBG V8.8.1 -->
-<script src="./senales_svg.js"></script>
+<!-- 2. DATOS SVG SEÑALES CBG V8.8.2 -->
+<script src="./data/senales_svg.js" defer></script>
 
 <!-- 3. LÓGICA PRINCIPAL - VA LA ÚLTIMA -->
-<script src="./apps.js?v=8.8.1"></script>
+<script src="./apps.js?v=8.8.2" defer></script>
 
 <!-- 4. REGISTRO SW -->
 <script>
 if('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js');
+  navigator.serviceWorker.register('./sw.js');
 }
 </script>
 
@@ -322,7 +322,7 @@ window.addEventListener('load', () => {
     const info = [
       'senales: ' + typeof preguntas_senales + ' len=' + preguntas_senales?.length,
       'normas: ' + typeof preguntas_normas + ' len=' + preguntas_normas?.length,
-      'auxilios: ' + typeof preguntas_auxilios + ' len=' + preguntas_auxilios?.length,
+      'medio: ' + typeof preguntas_medioambiente + ' len=' + preguntas_medioambiente?.length,
       'svg: ' + typeof senales_svg
     ].join(' | ');
     
