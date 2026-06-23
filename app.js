@@ -377,10 +377,25 @@ const ACCESORIOS = [
   {id:'a36',nombre:'Fuego',emoji:'🔥',precio:500,hp:15},
 ];
 
-function cambiarCategoriaSit(cat) {
-  sitCategoriaActiva = cat;
+// === BLOQUE 2: FUNCIONES UI + LÓGICA TEST/SIT/EXAMEN ===
+
+// Subtabs globales - CRÍTICO para que no dé ReferenceError
+window.cambiarSubTab = function(tab) {
+  document.querySelectorAll('.subtab-btn').forEach(btn => btn.classList.remove('active'));
+  document.querySelectorAll('.subtab-content').forEach(c => c.classList.remove('active'));
+
+  document.querySelector(`[data-subtab="${tab}"]`)?.classList.add('active');
+  document.getElementById(`subtab-${tab}`)?.classList.add('active');
+
+  if(typeof window.cargarPregunta === 'function') window.cargarPregunta(tab);
+}
+
+// Categorías Situaciones - global
+window.cambiarCategoriaSit = function(cat) {
+  window.sitCategoriaActiva = cat;
   document.querySelectorAll('#tab-situaciones.category-btn').forEach(btn => btn.classList.remove('active'));
-  event.target.classList.add('active');
+  if(event && event.target) event.target.classList.add('active');
+
   const titulos = {
     clima: '🌧️ CASOS REALES - CLIMA ADVERSO',
     urbano: '🏙️ CASOS REALES - URBANO',
@@ -388,11 +403,11 @@ function cambiarCategoriaSit(cat) {
     emergencia: '🚨 CASOS REALES - EMERGENCIA'
   };
   document.getElementById('sit-titulo').textContent = titulos[cat];
-  estado.sit[cat].idx = 0;
-  cargarSituacion(cat);
+  window.estado.sit[cat].idx = 0;
+  window.cargarSituacion(cat);
 }
 
-function mostrarEmoji(acierto, element) {
+window.mostrarEmoji = function(acierto, element) {
   const lista = acierto? EMOJIS_ACIERTO : EMOJIS_FALLO;
   const emoji = lista[Math.floor(Math.random() * lista.length)];
   const span = document.createElement('span');
@@ -404,15 +419,14 @@ function mostrarEmoji(acierto, element) {
   if(navigator.vibrate) navigator.vibrate(acierto? [30,20,30] : 100);
 }
 
-// TEST - 5 CATEGORÍAS: senales, normas, mecanica, auxilios, mediambiente
-// SVG SOLO PARA SEÑALES
-function cargarPregunta(cat) {
-  const s = estado.test[cat];
-  const preguntas = barajarArray(getPreguntas(cat));
+// TEST - 5 CATEGORÍAS
+window.cargarPregunta = function(cat) {
+  const s = window.estado.test[cat];
+  const preguntas = window.barajarArray(window.getPreguntas(cat));
   if(!preguntas || preguntas.length === 0) return;
 
   const pOriginal = preguntas[s.idx % preguntas.length];
-  const opcionesBarajadas = barajarArray(pOriginal.a);
+  const opcionesBarajadas = window.barajarArray(pOriginal.a);
   const textoCorrecto = pOriginal.a[pOriginal.ok];
   const nuevoIndexCorrecto = opcionesBarajadas.indexOf(textoCorrecto);
   const p = {...pOriginal, a: opcionesBarajadas, ok: nuevoIndexCorrecto};
@@ -424,11 +438,10 @@ function cargarPregunta(cat) {
   document.getElementById(`test-${cat}-score`).textContent = s.puntuacion;
   document.getElementById(`test-${cat}-progress`).style.width = `${((s.idx % preguntas.length)/preguntas.length)*100}%`;
 
-  // SVG SOLO PARA CATEGORÍA SEÑALES
   const imgCont = document.getElementById(`test-${cat}-imagen`);
   if(imgCont) {
     if(cat === 'senales' && p.img) {
-      const svg = getSVG(p.img);
+      const svg = window.getSVG(p.img);
       imgCont.innerHTML = svg;
       imgCont.style.display = svg? 'block' : 'none';
     } else {
@@ -446,13 +459,13 @@ function cargarPregunta(cat) {
     const div = document.createElement('div');
     div.className = 'opcio';
     div.textContent = txt;
-    div.onclick = function() { responderTest(cat, i, this); };
+    div.onclick = function() { window.responderTest(cat, i, this); };
     cont.appendChild(div);
   });
 }
 
-function responderTest(cat, idx, el) {
-  const s = estado.test[cat];
+window.responderTest = function(cat, idx, el) {
+  const s = window.estado.test[cat];
   const p = s.current;
   const cont = document.getElementById(`test-${cat}-opciones`);
   if(cont.querySelector('.correcta') || cont.querySelector('.incorrecta')) return;
@@ -464,37 +477,37 @@ function responderTest(cat, idx, el) {
     s.aciertos++;
     s.racha++;
     s.puntuacion += 10 + (s.racha * 2);
-    estado.coins += 5;
+    window.estado.coins += 5;
     document.getElementById(`test-${cat}-feedback`).className = 'feedback acierto';
     document.getElementById(`test-${cat}-feedback`).textContent = `✅ ¡CORRECTO! +${10+(s.racha*2)} pts`;
-    mostrarEmoji(true, el);
+    window.mostrarEmoji(true, el);
   } else {
     el.classList.add('incorrecta');
     cont.querySelectorAll('.opcio')[p.ok].classList.add('correcta');
     document.getElementById(`test-${cat}-feedback`).className = 'feedback fallo';
     document.getElementById(`test-${cat}-feedback`).textContent = '❌ FALLO';
-    mostrarEmoji(false, el);
+    window.mostrarEmoji(false, el);
     s.racha = 0;
   }
   document.getElementById(`btn-sig-test-${cat}`).disabled = false;
-  actualizarCoins();
-  guardar();
+  window.actualizarCoins();
+  window.guardar();
 }
 
-function siguienteTest(e, cat) {
-  estado.test[cat].idx++;
-  cargarPregunta(cat);
+window.siguienteTest = function(e, cat) {
+  window.estado.test[cat].idx++;
+  window.cargarPregunta(cat);
 }
 
-// CASOS - 4 categorías: clima, urbano, carretera, emergencia
-function cargarSituacion(cat) {
-  if(!cat) cat = sitCategoriaActiva;
-  const s = estado.sit[cat];
-  const casos = barajarArray(getSituaciones(cat));
+// CASOS - 4 categorías
+window.cargarSituacion = function(cat) {
+  if(!cat) cat = window.sitCategoriaActiva;
+  const s = window.estado.sit[cat];
+  const casos = window.barajarArray(window.getSituaciones(cat));
   if(!casos || casos.length === 0) return;
 
   const pOriginal = casos[s.idx % casos.length];
-  const opcionesBarajadas = barajarArray(pOriginal.a);
+  const opcionesBarajadas = window.barajarArray(pOriginal.a);
   const textoCorrecto = pOriginal.a[pOriginal.ok];
   const nuevoIndexCorrecto = opcionesBarajadas.indexOf(textoCorrecto);
   const p = {...pOriginal, a: opcionesBarajadas, ok: nuevoIndexCorrecto};
@@ -514,13 +527,13 @@ function cargarSituacion(cat) {
     const div = document.createElement('div');
     div.className = 'opcio';
     div.textContent = txt;
-    div.onclick = function() { responderSituacion(cat, i, this); };
+    div.onclick = function() { window.responderSituacion(cat, i, this); };
     cont.appendChild(div);
   });
 }
 
-function responderSituacion(cat, idx, el) {
-  const s = estado.sit[cat];
+window.responderSituacion = function(cat, idx, el) {
+  const s = window.estado.sit[cat];
   const p = s.current;
   const cont = document.getElementById(`sit-${cat}-opciones`);
   if(cont.querySelector('.correcta') || cont.querySelector('.incorrecta')) return;
@@ -531,36 +544,36 @@ function responderSituacion(cat, idx, el) {
     el.classList.add('correcta');
     s.aciertos++;
     s.puntuacion += 15;
-    estado.coins += 10;
+    window.estado.coins += 10;
     document.getElementById(`sit-${cat}-feedback`).className = 'feedback acierto';
     document.getElementById(`sit-${cat}-feedback`).textContent = `✅ ¡CORRECTO! +15 pts`;
-    mostrarEmoji(true, el);
+    window.mostrarEmoji(true, el);
   } else {
     el.classList.add('incorrecta');
     cont.querySelectorAll('.opcio')[p.ok].classList.add('correcta');
     document.getElementById(`sit-${cat}-feedback`).className = 'feedback fallo';
     document.getElementById(`sit-${cat}-feedback`).textContent = '❌ FALLO';
-    mostrarEmoji(false, el);
+    window.mostrarEmoji(false, el);
   }
   document.getElementById(`btn-sig-sit-${cat}`).disabled = false;
-  actualizarCoins();
-  guardar();
+  window.actualizarCoins();
+  window.guardar();
 }
 
-function siguienteSituacion(e, cat) {
-  estado.sit[cat].idx++;
-  cargarSituacion(cat);
+window.siguienteSituacion = function(e, cat) {
+  window.estado.sit[cat].idx++;
+  window.cargarSituacion(cat);
 }
 
-// EXAMEN - mezcla las 5 categorías de TEST, sin general
-function iniciarExamen(e) {
+// EXAMEN - todas las categorías
+window.iniciarExamen = function(e) {
   const todas = [
- ...getPreguntas('senales'),
- ...getPreguntas('normas'),
- ...getPreguntas('mecanica'),
- ...getPreguntas('auxilios'),
- ...getPreguntas('mediambiente'),
- ...getSituaciones('clima')
+   ...window.getPreguntas('senales'),
+   ...window.getPreguntas('normas'),
+   ...window.getPreguntas('mecanica'),
+   ...window.getPreguntas('auxilios'),
+   ...window.getPreguntas('mediambiente'),
+   ...window.getSituaciones('clima')
   ];
 
   if(todas.length < 30) {
@@ -568,57 +581,50 @@ function iniciarExamen(e) {
     return;
   }
 
-  estado.examen.preguntas = barajarArray(todas).slice(0, 30);
-  estado.examen.activa = true;
-  estado.examen.index = 0;
-  estado.examen.aciertos = 0;
-  estado.examen.fallos = 0;
-  estado.examen.categoria = 'senales';
-
-  const tipoExamen = {
-    senales: "EXAMEN OFICIAL 30 PREGUNTAS - Mixto DGT"
-  };
-  const tituloEl = document.querySelector('#tab-examen h2,.examen-titulo');
-  if(tituloEl) tituloEl.textContent = tipoExamen[estado.examen.categoria];
+  window.estado.examen.preguntas = window.barajarArray(todas).slice(0, 30);
+  window.estado.examen.activa = true;
+  window.estado.examen.index = 0;
+  window.estado.examen.aciertos = 0;
+  window.estado.examen.fallos = 0;
+  window.estado.examen.categoria = 'senales';
 
   document.getElementById('btn-iniciar-examen').style.display = 'none';
   document.getElementById('btn-sig-examen').style.display = 'block';
-  iniciarTimerExamen();
-  cargarPreguntaExamen();
+  window.iniciarTimerExamen();
+  window.cargarPreguntaExamen();
 }
 
-function iniciarTimerExamen() {
-  clearInterval(estado.examen.timer);
-  estado.examen.tiempo = 1800;
-  estado.examen.timer = setInterval(() => {
-    estado.examen.tiempo--;
-    const min = Math.floor(estado.examen.tiempo / 60);
-    const seg = estado.examen.tiempo % 60;
+window.iniciarTimerExamen = function() {
+  clearInterval(window.estado.examen.timer);
+  window.estado.examen.tiempo = 1800;
+  window.estado.examen.timer = setInterval(() => {
+    window.estado.examen.tiempo--;
+    const min = Math.floor(window.estado.examen.tiempo / 60);
+    const seg = window.estado.examen.tiempo % 60;
     document.getElementById('examen-timer').textContent =
       `${min.toString().padStart(2,'0')}:${seg.toString().padStart(2,'0')}`;
-    if(estado.examen.tiempo <= 0) finalizarExamen();
+    if(window.estado.examen.tiempo <= 0) window.finalizarExamen();
   }, 1000);
 }
 
-function cargarPreguntaExamen() {
-  if(estado.examen.index >= 30) return finalizarExamen();
-  const pOriginal = estado.examen.preguntas[estado.examen.index];
-  const opcionesBarajadas = barajarArray(pOriginal.a);
+window.cargarPreguntaExamen = function() {
+  if(window.estado.examen.index >= 30) return window.finalizarExamen();
+  const pOriginal = window.estado.examen.preguntas[window.estado.examen.index];
+  const opcionesBarajadas = window.barajarArray(pOriginal.a);
   const textoCorrecto = pOriginal.a[pOriginal.ok];
   const nuevoIndexCorrecto = opcionesBarajadas.indexOf(textoCorrecto);
   const p = {...pOriginal, a: opcionesBarajadas, ok: nuevoIndexCorrecto};
-  estado.examen.preguntas[estado.examen.index] = p;
+  window.estado.examen.preguntas[window.estado.examen.index] = p;
 
-  document.getElementById('examen-num').textContent = estado.examen.index + 1;
-  document.getElementById('examen-aciertos').textContent = estado.examen.aciertos;
-  document.getElementById('examen-progress').style.width = `${(estado.examen.index/30)*100}%`;
+  document.getElementById('examen-num').textContent = window.estado.examen.index + 1;
+  document.getElementById('examen-aciertos').textContent = window.estado.examen.aciertos;
+  document.getElementById('examen-progress').style.width = `${(window.estado.examen.index/30)*100}%`;
   document.getElementById('examen-pregunta').textContent = p.q;
 
-  // SVG en examen solo si es de señales
   const imgExamen = document.getElementById('examen-imagen');
   if(imgExamen) {
     if(p.img && p.id && p.id.startsWith('s')) {
-      imgExamen.innerHTML = getSVG(p.img);
+      imgExamen.innerHTML = window.getSVG(p.img);
       imgExamen.style.display = 'block';
     } else {
       imgExamen.innerHTML = '';
@@ -634,13 +640,13 @@ function cargarPreguntaExamen() {
     const div = document.createElement('div');
     div.className = 'opcio';
     div.textContent = txt;
-    div.onclick = function() { responderExamen(i, this); };
+    div.onclick = function() { window.responderExamen(i, this); };
     cont.appendChild(div);
   });
 }
 
-function responderExamen(idx, el) {
-  const p = estado.examen.preguntas[estado.examen.index];
+window.responderExamen = function(idx, el) {
+  const p = window.estado.examen.preguntas[window.estado.examen.index];
   const cont = document.getElementById('examen-opciones');
   if(cont.querySelector('.correcta') || cont.querySelector('.incorrecta')) return;
   cont.querySelectorAll('.opcio').forEach(o => o.classList.add('bloquejada'));
@@ -648,34 +654,34 @@ function responderExamen(idx, el) {
   const correcto = idx === p.ok;
   if(correcto) {
     el.classList.add('correcta');
-    estado.examen.aciertos++;
-    estado.coins += 20;
-    mostrarEmoji(true, el);
+    window.estado.examen.aciertos++;
+    window.estado.coins += 20;
+    window.mostrarEmoji(true, el);
   } else {
     el.classList.add('incorrecta');
     cont.querySelectorAll('.opcio')[p.ok].classList.add('correcta');
-    estado.examen.fallos++;
-    mostrarEmoji(false, el);
+    window.estado.examen.fallos++;
+    window.mostrarEmoji(false, el);
   }
   document.getElementById('btn-sig-examen').disabled = false;
-  document.getElementById('examen-aciertos').textContent = estado.examen.aciertos;
-  actualizarCoins();
-  guardar();
+  document.getElementById('examen-aciertos').textContent = window.estado.examen.aciertos;
+  window.actualizarCoins();
+  window.guardar();
 }
 
-function siguientePreguntaExamen(e) {
-  estado.examen.index++;
-  if(estado.examen.index >= 30) {
-    finalizarExamen();
+window.siguientePreguntaExamen = function(e) {
+  window.estado.examen.index++;
+  if(window.estado.examen.index >= 30) {
+    window.finalizarExamen();
   } else {
-    cargarPreguntaExamen();
+    window.cargarPreguntaExamen();
   }
 }
 
-function finalizarExamen() {
-  clearInterval(estado.examen.timer);
-  estado.examen.activa = false;
-  const nota = estado.examen.aciertos;
+window.finalizarExamen = function() {
+  clearInterval(window.estado.examen.timer);
+  window.estado.examen.activa = false;
+  const nota = window.estado.examen.aciertos;
   const aprobado = nota >= 27;
   const res = document.getElementById('examen-resultado');
   res.style.display = 'block';
@@ -684,25 +690,25 @@ function finalizarExamen() {
     res.innerHTML = `
       <h2 style="color:#2ecc71">✅ ¡APROBADO!</h2>
       <p style="font-size:24px">${nota}/30</p>
-      <p>Aciertos: ${nota} | Fallos: ${estado.examen.fallos}</p>
+      <p>Aciertos: ${nota} | Fallos: ${window.estado.examen.fallos}</p>
       <p>Has ganado +${nota*20} coins</p>
-      <button class="btn" onclick="reiniciarExamen()">Hacer otro examen</button>
+      <button class="btn" onclick="window.reiniciarExamen()">Hacer otro examen</button>
     `;
-    estado.coins += nota * 20;
+    window.estado.coins += nota * 20;
   } else {
     res.innerHTML = `
       <h2 style="color:#e74c3c">❌ SUSPENSO</h2>
       <p style="font-size:24px">${nota}/30</p>
-      <p>Aciertos: ${nota} | Fallos: ${estado.examen.fallos}</p>
+      <p>Aciertos: ${nota} | Fallos: ${window.estado.examen.fallos}</p>
       <p>Necesitas 27 aciertos mínimo</p>
-      <button class="btn" onclick="reiniciarExamen()">Volver a probar</button>
+      <button class="btn" onclick="window.reiniciarExamen()">Volver a probar</button>
     `;
   }
-  actualizarCoins();
-  guardar();
+  window.actualizarCoins();
+  window.guardar();
 }
 
-function reiniciarExamen() {
+window.reiniciarExamen = function() {
   document.getElementById('examen-resultado').style.display = 'none';
   document.getElementById('btn-iniciar-examen').style.display = 'block';
   document.getElementById('btn-sig-examen').style.display = 'none';
@@ -716,91 +722,90 @@ function reiniciarExamen() {
   if(imgExamen) imgExamen.innerHTML = '';
 }
 
-// GARAJE
-function cargarGaraje() {
+// GARAJE + TIENDA + TIPS + TEMARIO
+window.cargarGaraje = function() {
   const cont = document.getElementById('garage-lista');
   cont.innerHTML = '';
   let hpTotal = 90;
-  estado.accesorios.forEach(id => {
+  window.estado.accesorios.forEach(id => {
     const acc = window.ACCESORIOS && window.ACCESORIOS.find(a => a.id === id);
     if(acc) hpTotal += acc.hp;
   });
   document.getElementById('garage-score').textContent = `🏎️ ${hpTotal} CV`;
 
   (window.COCHES || []).forEach(coche => {
-    const desbloqueado = estado.coches.includes(coche.id);
+    const desbloqueado = window.estado.coches.includes(coche.id);
     const div = document.createElement('div');
     div.className = 'garage-car' + (desbloqueado? '' : ' locked');
     div.innerHTML = `
       <div style="font-size:40px; filter:${coche.color}">${coche.emoji}</div>
       <div>${coche.nom}</div>
       <div style="color:#667eea">${coche.cv} CV</div>
-      ${!desbloqueado? `<button class="btn-buy" onclick="comprarCoche('${coche.id}')">Comprar ${coche.preu}💰</button>` : '<div style="color:#2ecc71">✓ Propietario</div>'}
+      ${!desbloqueado? `<button class="btn-buy" onclick="window.comprarCoche('${coche.id}')">Comprar ${coche.preu}💰</button>` : '<div style="color:#2ecc71">✓ Propietario</div>'}
     `;
     cont.appendChild(div);
   });
 }
 
-function comprarCoche(id) {
+window.comprarCoche = function(id) {
   const coche = (window.COCHES || []).find(c => c.id === id);
   if(!coche) return;
-  if(estado.coins < coche.preu) {
+  if(window.estado.coins < coche.preu) {
     alert('No tienes suficientes coins');
     return;
   }
-  estado.coins -= coche.preu;
-  estado.coches.push(id);
-  guardar();
-  actualizarCoins();
-  cargarGaraje();
+  window.estado.coins -= coche.preu;
+  window.estado.coches.push(id);
+  window.guardar();
+  window.actualizarCoins();
+  window.cargarGaraje();
 }
 
-// TIENDA
-function cargarTienda() {
+window.cargarTienda = function() {
   const cont = document.getElementById('emoji-tienda');
   cont.innerHTML = '';
 
   (window.ACCESORIOS || []).forEach(acc => {
-    const comprado = estado.accesorios.includes(acc.id);
+    const comprado = window.estado.accesorios.includes(acc.id);
     const div = document.createElement('div');
     div.className = 'emoji-item' + (comprado? ' locked' : '');
     div.innerHTML = `
       <div style="font-size:40px">${acc.emoji}</div>
       <div>${acc.nom}</div>
       <div style="color:#667eea">+${acc.hp} CV</div>
-      ${!comprado? `<button class="btn-buy" onclick="comprarAccesorios('${acc.id}')">Comprar ${acc.preu}💰</button>` : '<div style="color:#2ecc71">✓ Comprado</div>'}
+      ${!comprado? `<button class="btn-buy" onclick="window.comprarAccesorios('${acc.id}')">Comprar ${acc.preu}💰</button>` : '<div style="color:#2ecc71">✓ Comprado</div>'}
     `;
     cont.appendChild(div);
   });
 
   (window.EMOJI_TIENDA || []).forEach(emoji => {
-    const comprado = estado.emojis.includes(emoji.id);
+    const comprado = window.estado.emojis.includes(emoji.id);
     const div = document.createElement('div');
     div.className = 'emoji-item' + (comprado? ' locked' : '');
     div.innerHTML = `
       <div style="font-size:40px">${emoji.emoji}</div>
       <div>${emoji.nom}</div>
       <div style="color:#667eea">Cosmético</div>
-      ${!comprado? `<button class="btn-buy" onclick="comprarEmoji('${emoji.id}')">Comprar ${emoji.preu}💰</button>` : '<div style="color:#2ecc71">✓ Comprado</div>'}
+      ${!comprado? `<button class="btn-buy" onclick="window.comprarEmoji('${emoji.id}')">Comprar ${emoji.preu}💰</button>` : '<div style="color:#2ecc71">✓ Comprado</div>'}
     `;
     cont.appendChild(div);
   });
 }
 
-function comprarAccesorios(id) {
+window.comprarAccesorios = function(id) {
   const acc = (window.ACCESORIOS || []).find(a => a.id === id);
   if(!acc) return;
-  if(estado.coins < acc.preu) {
+  if(window.estado.coins < acc.preu) {
     alert('No tienes suficientes coins');
     return;
   }
-  estado.coins -= acc.preu;
-  estado.accesorios.push(id);
-  guardar();
-  actualizarCoins();
-  cargarTienda();
+  window.estado.coins -= acc.preu;
+  window.estado.accesorios.push(id);
+  window.guardar();
+  window.actualizarCoins();
+  window.cargarTienda();
 
-  const totalAcc = estado.accesorios.length;
+  const totalAcc = window.estado.accesorios.length;
   const msg = document.createElement('div');
   msg.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#ff8c00,#ff2d55);color:#fff;padding:12px 24px;border-radius:12px;font-weight:bold;z-index:999;animation:slideUp 0.3s';
   msg.innerHTML = `🏎️ ¡Ya vas creando tu supercoche! ${totalAcc}/42 accesorios`;
@@ -808,72 +813,70 @@ function comprarAccesorios(id) {
   setTimeout(() => msg.remove(), 2000);
 }
 
-function comprarEmoji(id) {
+window.comprarEmoji = function(id) {
   const emoji = (window.EMOJI_TIENDA || []).find(e => e.id === id);
   if(!emoji) return;
-  if(estado.coins < emoji.preu) {
+  if(window.estado.coins < emoji.preu) {
     alert('No tienes suficientes coins');
     return;
   }
-  estado.coins -= emoji.preu;
-  estado.emojis.push(id);
-  guardar();
-  actualizarCoins();
-  cargarTienda();
+  window.estado.coins -= emoji.preu;
+  window.estado.emojis.push(id);
+  window.guardar();
+  window.actualizarCoins();
+  window.cargarTienda();
 }
 
-// TIPS
-function cargarTips() {
-  tipsData = window.TIPS || [];
-  currentTip = 0;
-  mostrarTip();
+window.cargarTips = function() {
+  window.tipsData = window.TIPS || [];
+  window.currentTip = 0;
+  window.mostrarTip();
 }
 
-function mostrarTip() {
-  if (tipsData.length === 0) return;
-  const tip = tipsData[currentTip];
+window.mostrarTip = function() {
+  if (window.tipsData.length === 0) return;
+  const tip = window.tipsData[window.currentTip];
   document.getElementById('tip-content').innerHTML = `
     <div class="tip-emoji">${tip.emoji}</div>
     <div class="tip-text">${tip.txt}</div>
   `;
-  document.getElementById('tip-counter').textContent = `${currentTip + 1} / ${tipsData.length}`;
+  document.getElementById('tip-counter').textContent = `${window.currentTip + 1} / ${window.tipsData.length}`;
 }
 
-function nextTip(e) {
-  currentTip = (currentTip + 1) % tipsData.length;
-  mostrarTip();
+window.nextTip = function(e) {
+  window.currentTip = (window.currentTip + 1) % window.tipsData.length;
+  window.mostrarTip();
 }
 
-function prevTip(e) {
-  currentTip = (currentTip - 1 + tipsData.length) % tipsData.length;
-  mostrarTip();
+window.prevTip = function(e) {
+  window.currentTip = (window.currentTip - 1 + window.tipsData.length) % window.tipsData.length;
+  window.mostrarTip();
 }
 
-// TEMARIO
-function cargarTemario() {
+window.cargarTemario = function() {
   const container = document.getElementById('temario-lista');
   container.innerHTML = `
-    <div class="temario-item" onclick="abrirPDF('./01_Senales_Tomo_I_RD_465_2025.pdf')">
+    <div class="temario-item" onclick="window.abrirPDF('./01_Senales_Tomo_I_RD_465_2025.pdf')">
       <div style="font-size:40px">🚦</div>
       <div>Señales</div>
       <div style="font-size:11px;color:#999">RD 465/2025</div>
     </div>
-    <div class="temario-item" onclick="abrirPDF('./02_Normas_Circulacion_Tomo_II_Edicion_2024.pdf')">
+    <div class="temario-item" onclick="window.abrirPDF('./02_Normas_Circulacion_Tomo_II_Edicion_2024.pdf')">
       <div style="font-size:40px">📋</div>
       <div>Normas Circulación</div>
       <div style="font-size:11px;color:#999">Edición 2024</div>
     </div>
-    <div class="temario-item" onclick="abrirPDF('./03_Manual_IX_Primeros_Auxilios_2025.pdf')">
+    <div class="temario-item" onclick="window.abrirPDF('./03_Manual_IX_Primeros_Auxilios_2025.pdf')">
       <div style="font-size:40px">🚑</div>
       <div>Primeros Auxilios</div>
       <div style="font-size:11px;color:#999">Manual IX 2025</div>
     </div>
-    <div class="temario-item" onclick="abrirPDF('./04_Manual_VIII_Mecanica_2024.pdf')">
+    <div class="temario-item" onclick="window.abrirPDF('./04_Manual_VIII_Mecanica_2024.pdf')">
       <div style="font-size:40px">⚙️</div>
       <div>Mecánica</div>
       <div style="font-size:11px;color:#999">Manual VIII 2025</div>
     </div>
-    <div class="temario-item" onclick="abrirPDF('./05_Medio_Ambiente_Distintivos_DGT_2025.pdf')">
+    <div class="temario-item" onclick="window.abrirPDF('./05_Medio_Ambiente_Distintivos_DGT_2025.pdf')">
       <div style="font-size:40px">♻️</div>
       <div>Medio Ambiente</div>
       <div style="font-size:11px;color:#999">Distintivos DGT 2025</div>
@@ -881,7 +884,7 @@ function cargarTemario() {
   `;
 }
 
-function abrirPDF(ruta) {
+window.abrirPDF = function(ruta) {
   const modal = document.createElement('div');
   modal.id = 'pdf-modal';
   modal.style.cssText = `
@@ -891,7 +894,7 @@ function abrirPDF(ruta) {
   `;
   modal.innerHTML = `
     <div style="background:#1a1a1a;padding:12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #333">
-      <button onclick="cerrarPDF()" style="background:none;border:none;color:#00D9FF;font-size:16px;font-weight:700">← Volver</button>
+      <button onclick="window.cerrarPDF()" style="background:none;border:none;color:#00D9FF;font-size:16px;font-weight:700">← Volver</button>
       <div style="color:#fff;font-size:15px;font-weight:700">Temario DGT</div>
       <div style="width:60px"></div>
     </div>
@@ -900,12 +903,12 @@ function abrirPDF(ruta) {
   document.body.appendChild(modal);
 }
 
-function cerrarPDF() {
+window.cerrarPDF = function() {
   const modal = document.getElementById('pdf-modal');
   if(modal) modal.remove();
 }
 
-function actualizarMensajeMotivacional() {
+window.actualizarMensajeMotivacional = function() {
   const mensajes = [
     "Vas por buen camino 💪",
     "Cada fallo te hace más fuerte 🔥",
