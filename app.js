@@ -158,12 +158,12 @@ function init() {
     window.categoriaActual = 'general'; // FIX: Asegurar valor inicial
 
     const PREGUNTAS_GENERAL = mezclarSinDuplicar(
-      window.PREGUNTAS_SENALES || [],
-      window.PREGUNTAS_NORMAS || [],
-      window.PREGUNTAS_MECANICA || [],
-      window.PREGUNTAS_AUXILIOS || [],
-      window.PREGUNTAS_MEDIOAMBIENTE || []
-    );
+  window.preguntas_senales || [],
+  window.preguntas_normas || [],
+  window.preguntas_mecanica || [],
+  window.preguntas_auxilios || [],
+  window.preguntas_medioambiente || []
+);
     window.PREGUNTAS_GENERAL = PREGUNTAS_GENERAL;
 
     console.log(`DEBUG: General cargó ${PREGUNTAS_GENERAL.length} preguntas`);
@@ -567,12 +567,12 @@ window.siguienteSituacion = function(e, cat) {
 // EXAMEN - todas las categorías
 window.iniciarExamen = function(e) {
   const todas = [
-   ...window.getPreguntas('senales'),
-   ...window.getPreguntas('normas'),
-   ...window.getPreguntas('mecanica'),
-   ...window.getPreguntas('auxilios'),
-   ...window.getPreguntas('medioambiente'),
-   ...window.getSituaciones('clima')
+  ...window.getPreguntas('senales'),
+  ...window.getPreguntas('normas'),
+  ...window.getPreguntas('mecanica'),
+  ...window.getPreguntas('auxilios'),
+  ...window.getPreguntas('medioambiente'),
+  ...window.getSituaciones('clima')
   ];
 
   if(todas.length < 30) {
@@ -924,7 +924,7 @@ window.actualizarMensajeMotivacional = function() {
 if('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('./service-worker.js')
- .then(reg => console.log('SW registrado'))
- .catch(err => console.log('SW error:', err));
+.then(reg => console.log('SW registrado'))
+.catch(err => console.log('SW error:', err));
   });
 }
