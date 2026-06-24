@@ -41,7 +41,7 @@ let estado = {
     normas: {idx:0,aciertos:0,racha:0,puntuacion:0},
     mecanica: {idx:0,aciertos:0,racha:0,puntuacion:0},
     auxilios: {idx:0,aciertos:0,racha:0,puntuacion:0},
-    medioambiente: {idx:0,aciertos:0,racha:0,puntuacion:0}  // <-- CORREGIDO: tenía "mediambiente"
+    medioambiente: {idx:0,aciertos:0,racha:0,puntuacion:0}  
   },
   examen: {
     activa: false,
@@ -93,7 +93,7 @@ function init() {
   cargarPregunta('normas');
   cargarPregunta('mecanica');
   cargarPregunta('auxilios');
-  cargarPregunta('mediambiente');
+  cargarPregunta('medioambiente');
   cargarSituacion('clima');
 
   actualizarMensajeMotivacional();
@@ -572,7 +572,7 @@ window.iniciarExamen = function(e) {
    ...window.getPreguntas('normas'),
    ...window.getPreguntas('mecanica'),
    ...window.getPreguntas('auxilios'),
-   ...window.getPreguntas('mediambiente'),
+   ...window.getPreguntas('medioambiente'),
    ...window.getSituaciones('clima')
   ];
 
