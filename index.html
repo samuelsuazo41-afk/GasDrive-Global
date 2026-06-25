@@ -70,210 +70,6 @@ h1{font-size:24px;font-weight:900;letter-spacing:1.5px;margin-bottom:3px}
 #test-senales-imagen:not(:empty) { display: block; }
 #test-senales-imagen svg { max-width: 100%; max-height: 190px; display: block; margin: 0 auto; }
 </style>
-
-<script>
-// === TOKUMASTER v2.0 ===
-(function() {
-  const log = [];
-  function show() {
-    let div = document.getElementById('toku-box');
-    if(!div) {
-      div = document.createElement('div');
-      div.id = 'toku-box';
-      div.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:#0a0a0a;color:#0f0;padding:8px;z-index:9999;font-size:11px;max-height:180px;overflow:auto;border-top:2px solid #00D9FF;font-family:monospace';
-      document.body.appendChild(div);
-    }
-    div.innerHTML = log.slice(-12).join('<br>');
-  }
-  window.onerror = (msg, url, line) => {
-    log.push('❌ <span style="color:#ff5555">' + msg + ' L' + line + '</span>');
-    show();
-    return false;
-  };
-  window.addEventListener('unhandledrejection', e => {
-    log.push('⚠️ <span style="color:#ffaa00">Promise: ' + e.reason + '</span>');
-    show();
-  });
-  setInterval(() => {
-    const s = window.preguntas_senales?.length || 0;
-    const n = window.preguntas_normas?.length || 0;
-    const m = window.preguntas_mecanica?.length || 0;
-    const a = window.preguntas_auxilios?.length || 0;
-    const me = window.preguntas_medioambiente?.length || 0;
-    const svg = typeof window.senales_svg;
-    log.push(`✅ <span style="color:#55ff55">sen:${s} norm:${n} mec:${m} aux:${a} med:${me} svg:${svg}</span>`);
-    show();
-  }, 3000);
-  window.addEventListener('load', () => {
-    log.push('🚀 <span style="color:#55aaff">App cargada - Esperando datos...</span>');
-    show();
-  });
-})();
-
-// === STUBS INLINE ===
-let preguntaActual = null;
-let categoriaActual = 'senales';
-let sitCategoriaActiva = 'clima';
-let stats = {aciertos:0, racha:0, score:0};
-
-function cambiarTab(e, tab) {
-  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('tab-' + tab).classList.add('active');
-  e.target.closest('.tab-btn').classList.add('active');
-  if(tab === 'garage') cargarGaraje();
-  if(tab === 'tienda') cargarTienda();
-  if(tab === 'tips') cargarTips();
-  if(tab === 'temario') cargarTemario();
-  if(tab === 'test') cargarPregunta('senales');
-  if(tab === 'situaciones') cargarSituacion(sitCategoriaActiva);
-}
-
-function cambiarSubTab(e, tab, subtab) {
-  const tabId = tab === 'sit'? 'situaciones' : tab;
-  const contenedor = document.getElementById('tab-' + tabId);
-  contenedor.querySelectorAll('.sub-tab-btn').forEach(b => b.classList.remove('active'));
-  contenedor.querySelectorAll('.sub-content').forEach(c => c.classList.remove('active'));
-  e.target.classList.add('active');
-  document.getElementById(`${tab === 'test'? 'test' : 'sit'}-${subtab}`).classList.add('active');
-  if(tab === 'test') cargarPregunta(subtab);
-  if(tab === 'sit') cargarSituacion(subtab);
-}
-
-function cargarPregunta(cat) {
-  categoriaActual = cat;
-  stats = {aciertos:0, racha:0, score:0};
-  actualizarStats(cat);
-  const data = window['preguntas_' + cat];
-  if(!data ||!data.length) {
-    document.getElementById(`test-${cat}-pregunta`).textContent = 'Error: No hay datos en preguntas_' + cat;
-    return;
-  }
-  nuevaPregunta(cat);
-}
-
-function nuevaPregunta(cat) {
-  const data = window['preguntas_' + cat];
-  preguntaActual = data[Math.floor(Math.random() * data.length)];
-  document.getElementById(`test-${cat}-pregunta`).textContent = preguntaActual.pregunta;
-  const opcionesDiv = document.getElementById(`test-${cat}-opciones`);
-  opcionesDiv.innerHTML = '';
-  preguntaActual.opciones.forEach((op, i) => {
-    const div = document.createElement('div');
-    div.className = 'opcio';
-    div.textContent = op;
-    div.onclick = () => seleccionarRespuesta(i, preguntaActual.respuesta, cat);
-    opcionesDiv.appendChild(div);
-  });
-  const imgDiv = document.getElementById(`test-${cat}-imagen`);
-  if(cat === 'senales' && preguntaActual.imagen && window.senales_svg) {
-    imgDiv.innerHTML = window.senales_svg[preguntaActual.imagen] || '';
-    imgDiv.style.display = 'block';
-  } else {
-    imgDiv.style.display = 'none';
-  }
-  document.getElementById(`btn-sig-test-${cat}`).disabled = true;
-  document.getElementById(`test-${cat}-feedback`).textContent = '';
-  document.getElementById(`test-${cat}-feedback`).className = 'feedback';
-}
-
-function seleccionarRespuesta(idx, correcta, cat) {
-  // CORREGIDO: espacio entre id y.opcio
-  document.querySelectorAll(`#test-${cat}-opciones .opcio`).forEach((op, i) => {
-    op.classList.add('bloquejada');
-    if(i === correcta) op.classList.add('correcta');
-    if(i === idx && i!== correcta) op.classList.add('incorrecta');
-  });
-  const fb = document.getElementById(`test-${cat}-feedback`);
-  if(idx === correcta) {
-    fb.textContent = '✓ ACIERTO';
-    fb.className = 'feedback acierto';
-    stats.aciertos++;
-    stats.racha++;
-    stats.score += 10 * stats.racha;
-  } else {
-    fb.textContent = '✗ FALLO';
-    fb.className = 'feedback fallo';
-    stats.racha = 0;
-  }
-  actualizarStats(cat);
-  document.getElementById(`btn-sig-test-${cat}`).disabled = false;
-}
-
-function actualizarStats(cat) {
-  document.getElementById(`test-${cat}-aciertos`).textContent = stats.aciertos;
-  document.getElementById(`test-${cat}-racha`).textContent = stats.racha;
-  document.getElementById(`test-${cat}-score`).textContent = stats.score;
-  const progress = Math.min((stats.aciertos/5)*100, 100);
-  document.getElementById(`test-${cat}-progress`).style.width = progress + '%';
-}
-
-function siguienteTest(e, cat) {
-  if(stats.aciertos >= 5) {
-    alert('¡Test completado! Score: ' + stats.score);
-    cargarPregunta(cat);
-    return;
-  }
-  nuevaPregunta(cat);
-}
-
-function cargarSituacion(cat) {
-  sitCategoriaActiva = cat;
-  const data = window.preguntas_situaciones;
-  if(!data ||!data[cat] ||!data[cat].length) {
-    document.getElementById(`sit-${cat}-pregunta`).textContent = 'Situación ' + cat + ' - datos cargando...';
-    return;
-  }
-  const sit = data[cat][Math.floor(Math.random() * data[cat].length)];
-  document.getElementById(`sit-${cat}-pregunta`).textContent = sit.pregunta;
-  const opcionesDiv = document.getElementById(`sit-${cat}-opciones`);
-  opcionesDiv.innerHTML = '';
-  sit.opciones.forEach((op, i) => {
-    const div = document.createElement('div');
-    div.className = 'opcio';
-    div.textContent = op;
-    div.onclick = () => {
-      opcionesDiv.querySelectorAll('.opcio').forEach(o => o.classList.add('bloquejada'));
-      div.classList.add(i === sit.respuesta? 'correcta' : 'incorrecta');
-      document.getElementById(`sit-${cat}-feedback`).textContent = i === sit.respuesta? '✓ Bien' : '✗ Mal';
-      document.getElementById(`btn-sig-sit-${cat}`).disabled = false;
-    };
-    opcionesDiv.appendChild(div);
-  });
-  document.getElementById(`btn-sig-sit-${cat}`).disabled = true;
-}
-
-function siguienteSituacion(e, cat) {
-  cargarSituacion(cat);
-}
-
-function cargarGaraje() {
-  document.getElementById('garage-lista').innerHTML = '<div class="garage-car"><h3>Seat Ibiza 90CV</h3><p>Tu coche inicial</p></div>';
-}
-
-function cargarTienda() {
-  document.getElementById('emoji-tienda').innerHTML = '<div class="emoji-item"><div>🏎️</div><div>Ferrari F40</div><button class="btn-buy">500 pts</button></div>';
-}
-
-function cargarTips() {
-  document.getElementById('tip-content').innerHTML = '<div class="tip"><div class="tip-emoji">💡</div><div>Mantén distancia de seguridad: 2 segundos</div></div>';
-}
-
-function nextTip(e) { cargarTips(); }
-function prevTip(e) { cargarTips(); }
-
-function cargarTemario() {
-  document.getElementById('temario-lista').innerHTML =
-    '<div class="temario-item"><div>📋</div><div>Normas</div></div>' +
-    '<div class="temario-item"><div>🚦</div><div>Señales</div></div>' +
-    '<div class="temario-item"><div>⚙️</div><div>Mecánica</div></div>' +
-    '<div class="temario-item"><div>🚑</div><div>Auxilios</div></div>';
-}
-
-function iniciarExamen(e) {
-  alert('Examen 30 preguntas - lógica completa en apps.js');
-}
-</script>
 </head>
 <body>
 <div class="header">
@@ -333,7 +129,7 @@ function iniciarExamen(e) {
   <div id="test-auxilios" class="sub-content">
     <div class="card">
       <h2>🚑 PRIMEROS AUXILIOS</h2>
-      <div class="stats"><div>Aciertos: <span id="test-auxilios-aciertos">0</span>/5</div><div>Racha: <span id="test-auxilios-racha">0</span>🔥</div><div>Score: <span id="test-mecanica-racha">0</span>🔥</div><div>Score: <span id="test-auxilios-score">0</span></div></div>
+      <div class="stats"><div>Aciertos: <span id="test-auxilios-aciertos">0</span>/5</div><div>Racha: <span id="test-auxilios-racha">0</span>🔥</div><div>Score: <span id="test-auxilios-score">0</span></div></div>
       <div class="progress-bar"><div class="progress-fill" id="test-auxilios-progress"></div></div>
       <div id="test-auxilios-imagen" style="display:none"></div>
       <div class="pregunta" id="test-auxilios-pregunta"></div>
@@ -366,11 +162,11 @@ function iniciarExamen(e) {
   </div>
   <div id="sit-clima" class="sub-content active"><div class="card"><h2>🌧️ CASOS REALES - CLIMA</h2><div class="stats"><div>Resueltas: <span id="sit-clima-aciertos">0</span>/20</div><div>Score: <span id="sit-clima-score">0</span></div></div><div class="progress-bar"><div class="progress-fill" id="sit-clima-progress"></div></div><div class="pregunta" id="sit-clima-pregunta"></div><div id="sit-clima-opciones"></div><div class="feedback" id="sit-clima-feedback"></div><button class="btn-sig" id="btn-sig-sit-clima" onclick="siguienteSituacion(event,'clima')" disabled>SIGUIENTE</button></div></div>
   <div id="sit-urbano" class="sub-content"><div class="card"><h2>🏙️ CASOS REALES - URBANO</h2><div class="stats"><div>Resueltas: <span id="sit-urbano-aciertos">0</span>/20</div><div>Score: <span id="sit-urbano-score">0</span></div></div><div class="progress-bar"><div class="progress-fill" id="sit-urbano-progress"></div></div><div class="pregunta" id="sit-urbano-pregunta"></div><div id="sit-urbano-opciones"></div><div class="feedback" id="sit-urbano-feedback"></div><button class="btn-sig" id="btn-sig-sit-urbano" onclick="siguienteSituacion(event,'urbano')" disabled>SIGUIENTE</button></div></div>
-  <div id="sit-carretera" class="sub-content"><div class="card"><h2>🛣️ CASOS REALES - CARRETERA</h2><div class="stats"><div>Resueltas: <span id="sit-carretera-aciertos">0</span>/20</div><div>Score: <span id="sit-carretera-score">0</span></div></div><div class="progress-bar"><div class="progress-fill" id="sit-carretera-progress"></div></div><div class="pregunta" id="sit-carretera-pregunta"></div><div id="sit-carretera-opciones"></div><div class="feedback" id="sit-clima-feedback"></div><button class="btn-sig" id="btn-sig-sit-carretera" onclick="siguienteSituacion(event,'carretera')" disabled>SIGUIENTE</button></div></div>
+  <div id="sit-carretera" class="sub-content"><div class="card"><h2>🛣️ CASOS REALES - CARRETERA</h2><div class="stats"><div>Resueltas: <span id="sit-carretera-aciertos">0</span>/20</div><div>Score: <span id="sit-carretera-score">0</span></div></div><div class="progress-bar"><div class="progress-fill" id="sit-carretera-progress"></div></div><div class="pregunta" id="sit-carretera-pregunta"></div><div id="sit-carretera-opciones"></div><div class="feedback" id="sit-carretera-feedback"></div><button class="btn-sig" id="btn-sig-sit-carretera" onclick="siguienteSituacion(event,'carretera')" disabled>SIGUIENTE</button></div></div>
   <div id="sit-emergencia" class="sub-content"><div class="card"><h2>🚨 CASOS REALES - EMERGENCIA</h2><div class="stats"><div>Resueltas: <span id="sit-emergencia-aciertos">0</span>/20</div><div>Score: <span id="sit-emergencia-score">0</span></div></div><div class="progress-bar"><div class="progress-fill" id="sit-emergencia-progress"></div></div><div class="pregunta" id="sit-emergencia-pregunta"></div><div id="sit-emergencia-opciones"></div><div class="feedback" id="sit-emergencia-feedback"></div><button class="btn-sig" id="btn-sig-sit-emergencia" onclick="siguienteSituacion(event,'emergencia')" disabled>SIGUIENTE</button></div></div>
 </div>
 
-<div id="tab-examen" class="tab-content"><div class="card"><h2>📋 EXAMEN OFICIAL 30 PREGUNTAS</h2><div class="stats"><div>Pregunta: <span id="examen-num">0</span>/30</div><div>Aciertos: <span id="examen-aciertos">0</span></div><div>Tiempo: <span id="examen-timer">30:00</span></div></div><div class="progress-bar"><div class="progress-fill" id="examen-progress"></div></div><div class="pregunta" id="examen-pregunta">Pulsa Iniciar Examen</div><div id="examen-imagen" style="display:none"></div><div id="examen-opciones"></div><button class="btn-sig" id="btn-iniciar-examen" onclick="iniciarExamen(event)">INICIAR EXAMEN</button></div></div>
+<div id="tab-examen" class="tab-content"><div class="card"><h2>📋 EXAMEN OFICIAL 30 PREGUNTAS</h2><div class="stats"><div>Pregunta: <span id="examen-num">0</span>/30</div><div>Aciertos: <span id="examen-aciertos">0</span></div><div>Tiempo: <span id="examen-timer">30:00</span></div></div><div class="progress-bar"><div class="progress-fill" id="examen-progress"></div></div><div class="pregunta" id="examen-pregunta">Pulsa Iniciar Examen</div><div id="examen-imagen" style="display:none"></div><div id="examen-opciones"></div><button class="btn-sig" id="btn-iniciar-examen" onclick="iniciarExamen(event)">INICIAR EXAMEN</button><div id="examen-resultado" style="display:none"></div></div></div>
 
 <div id="tab-garage" class="tab-content"><div class="card"><h2>🏁 TU GARAJE</h2><div class="score-big" id="garage-score">🏎️ 90 CV</div><div id="garage-lista"></div></div></div>
 
