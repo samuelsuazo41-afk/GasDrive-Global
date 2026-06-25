@@ -822,31 +822,32 @@ function prevTip(e) {
   mostrarTip();
 }
 
+// RUTAS TEMARIO EN RAÍZ - AJUSTADO A TUS ARCHIVOS REALES
 function cargarTemario() {
   const container = document.getElementById('temario-lista');
   if(!container) return;
   container.innerHTML = `
-    <div class="temario-item" onclick="abrirPDF('/content/temario/01-senales/leccion.pdf')">
+    <div class="temario-item" onclick="abrirPDF('./01_Senales_Tomo_I_RD_465_2025.pdf')">
       <div style="font-size:40px">🚦</div>
-      <div>Señales</div>
+      <div>Señales de tráfico</div>
       <div style="font-size:11px;color:#999">RD 465/2025</div>
     </div>
-    <div class="temario-item" onclick="abrirPDF('/content/temario/02-normas/leccion.pdf')">
+    <div class="temario-item" onclick="abrirPDF('./02_Normas_Circulacion_Tomo_II_Edicion_2024.pdf')">
       <div style="font-size:40px">📋</div>
       <div>Normas Circulación</div>
       <div style="font-size:11px;color:#999">Edición 2024</div>
     </div>
-    <div class="temario-item" onclick="abrirPDF('/content/temario/03-mecanica/leccion.pdf')">
+    <div class="temario-item" onclick="abrirPDF('./04_Manual_VIII_Mecanica_2024.pdf')">
       <div style="font-size:40px">⚙️</div>
-      <div>Mecánica</div>
-      <div style="font-size:11px;color:#999">Manual VIII 2025</div>
+      <div>Mecánica del vehículo</div>
+      <div style="font-size:11px;color:#999">Manual VIII 2024</div>
     </div>
-    <div class="temario-item" onclick="abrirPDF('/content/temario/04-primeros-auxilios/leccion.pdf')">
+    <div class="temario-item" onclick="abrirPDF('./03_Manual_IX_Primeros_Auxilios_2025.pdf')">
       <div style="font-size:40px">🚑</div>
       <div>Primeros Auxilios</div>
       <div style="font-size:11px;color:#999">Manual IX 2025</div>
     </div>
-    <div class="temario-item" onclick="abrirPDF('/content/temario/05-medio-ambiente/leccion.pdf')">
+    <div class="temario-item" onclick="abrirPDF('./05_Medio_Ambiente_Distintivos_DGT_2025.pdf')">
       <div style="font-size:40px">♻️</div>
       <div>Medio Ambiente</div>
       <div style="font-size:11px;color:#999">Distintivos DGT 2025</div>
