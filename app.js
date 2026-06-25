@@ -1,8 +1,8 @@
-// GASDRIVE DGT V8.5 ES - DATA EXTERNA + SVG READY
+// GASDRIVE DGT V9.0 ES - COMPLETO SIN PARCHES
 const EMOJIS_ACIERTO = ['🚀','💎','👑','🔥','💯','⚡','🏆','🦄','🤑','✅','💪','😎','🎯','💥','🌟','🎉'];
 const EMOJIS_FALLO = ['❌','💀','😭','⛔','💔','😵','🤦','🚫','💩','🤡','💥','😤'];
 
-// INTRO SCREEN - Aparece SIEMPRE al abrir. No se toca.
+// INTRO SCREEN - NO TOCAR
 function mostrarIntro(){
   document.body.insertAdjacentHTML('afterbegin', `
     <div id="intro-screen" style="position:fixed;top:0;left:0;right:0;bottom:0;background:linear-gradient(135deg,#1a1a2e,#16213e);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-align:center;padding:20px">
@@ -25,7 +25,7 @@ function cerrarIntro(){
   document.getElementById('intro-screen').remove();
 }
 
-// ===== ESTADO GLOBAL - SIN GENERAL =====
+// ===== ESTADO GLOBAL =====
 let tipsData = [];
 let currentTip = 0;
 let sitCategoriaActiva = 'clima';
@@ -36,12 +36,11 @@ let estado = {
   accesorios: JSON.parse(localStorage.getItem('gd_accesorios')) || [],
   emojis: JSON.parse(localStorage.getItem('gd_emojis')) || [],
   test: {
-    // GENERAL ELIMINADO
-    senales: {idx:0,aciertos:0,racha:0,puntuacion:0},
-    normas: {idx:0,aciertos:0,racha:0,puntuacion:0},
-    mecanica: {idx:0,aciertos:0,racha:0,puntuacion:0},
-    auxilios: {idx:0,aciertos:0,racha:0,puntuacion:0},
-    medioambiente: {idx:0,aciertos:0,racha:0,puntuacion:0}
+    senales: {idx:0,aciertos:0,racha:0,puntuacion:0,current:null},
+    normas: {idx:0,aciertos:0,racha:0,puntuacion:0,current:null},
+    mecanica: {idx:0,aciertos:0,racha:0,puntuacion:0,current:null},
+    auxilios: {idx:0,aciertos:0,racha:0,puntuacion:0,current:null},
+    medioambiente: {idx:0,aciertos:0,racha:0,puntuacion:0,current:null}
   },
   examen: {
     activa: false,
@@ -50,8 +49,7 @@ let estado = {
     aciertos: 0,
     fallos: 0,
     timer: null,
-    tiempo: 1800,
-    categoria: 'senales'
+    tiempo: 1800
   },
   sit: {
     clima: {idx:0,aciertos:0,puntuacion:0,current:null},
@@ -61,92 +59,7 @@ let estado = {
   }
 };
 
-// Helper para leer datos desde window sin romper si falta archivo
-function getPreguntas(cat) {
-  const key = 'preguntas_' + cat;
-  return window[key] || [];
-}
-
-function getSituaciones(cat) {
-  const key = 'preguntas_situaciones';
-  return window[key] && window[key][cat]? window[key][cat] : [];
-}
-
-function getSVG(id) {
-  return window.senales_svg && window.senales_svg[id]? window.senales_svg[id] : '';
-}
-
-// Init se ejecuta cuando index.html carga apps.js
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', init);
-} else {
-  init();
-}
-
-function init() {
-  console.log("GasDrive V8.5 ES cargado - Datos desde /data/");
-  mostrarIntro();
-  actualizarCoins();
-
-  // Carga inicial de todas las categorías. GENERAL ELIMINADO
-  cargarPregunta('senales');
-  cargarPregunta('normas');
-  cargarPregunta('mecanica');
-  cargarPregunta('auxilios');
-  cargarPregunta('medioambiente');
-  cargarSituacion('clima');
-
-  actualizarMensajeMotivacional();
-}
-
-function guardar() {
-  localStorage.setItem('gd_coins', estado.coins);
-  localStorage.setItem('gd_coches', JSON.stringify(estado.coches));
-  localStorage.setItem('gd_accesorios', JSON.stringify(estado.accesorios));
-  localStorage.setItem('gd_emojis', JSON.stringify(estado.emojis));
-}
-
-function actualizarCoins() {
-  const el = document.getElementById('coins');
-  if(el) el.textContent = `💰 ${estado.coins}`;
-}
-
-// Fisher-Yates
-function barajarArray(arr) {
-  const a = arr.slice();
-  for(let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
-
-function cambiarTab(e, tab) {
-  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('tab-' + tab).classList.add('active');
-  e.target.closest('.tab-btn').classList.add('active');
-
-  if(tab === 'garage') cargarGaraje();
-  if(tab === 'tienda') cargarTienda();
-  if(tab === 'tips') cargarTips();
-  if(tab === 'temario') cargarTemario();
-  if(tab === 'test') cargarPregunta('senales');
-  if(tab === 'situaciones') cargarSituacion(sitCategoriaActiva);
-}
-
-function cambiarSubTab(e, tab, subtab) {
-  const tabId = tab === 'sit'? 'situaciones' : tab;
-  const contenedor = document.getElementById('tab-' + tabId);
-  contenedor.querySelectorAll('.sub-tab-btn').forEach(b => b.classList.remove('active'));
-  contenedor.querySelectorAll('.sub-content').forEach(c => c.classList.remove('active'));
-  e.target.classList.add('active');
-  document.getElementById(`${tab === 'test'? 'test' : 'sit'}-${subtab}`).classList.add('active');
-  if(tab === 'test') cargarPregunta(subtab);
-  if(tab === 'sit') cargarSituacion(subtab);
-}
-
-// 100 TIPS DEL DÍA - DOPAMINA DIARIA
+// 100 TIPS
 const TIPS = [
   {emoji:'🚗', txt:'Regla de los 2 segundos: mantén distancia con el coche de delante'},
   {emoji:'👀', txt:'Mira 12 segundos hacia delante, no solo el coche de delante'},
@@ -251,34 +164,27 @@ const TIPS = [
   {emoji:'🏆', txt:'¡Tú puedes sacarte el carnet!'}
 ];
 
-
-// GARAJE - 17 COCHES CON 6 SUPERCOCHES NUEVOS
 const COCHES = [
-  // 3 primeros normales, sin filtro
   {id:'c1',nombre:'SEAT Ibiza',emoji:'🚗',precio:200,cv:90,color:''},
   {id:'c2',nombre:'VW Golf GTI',emoji:'🚘',precio:800,cv:220,color:''},
   {id:'c3',nombre:'BMW M3',emoji:'🚙',precio:1500,cv:420,color:''},
-
-  // Resto con efecto TRON y colores caros
-  {id:'c4',nombre:'Tesla Model S',emoji:'⚡',precio:2000,cv:670,color:'hue-rotate(210deg) saturate(2) brightness(1.2) drop-shadow(0 0 6px #00d4ff)'}, // azul electrico
-  {id:'c5',nombre:'Porsche 911',emoji:'🏎️',precio:2500,cv:450,color:'hue-rotate(130deg) saturate(2) brightness(1.2) drop-shadow(0 0 6px #00ff88)'}, // verde esmeralda
-  {id:'c6',nombre:'Bugatti Chiron',emoji:'🏎️',precio:5000,cv:1500,color:'hue-rotate(200deg) saturate(2) brightness(1.2) drop-shadow(0 0 6px #00c8ff)'}, // azul hielo
-  {id:'c7',nombre:'Yamaha R1',emoji:'🏍️',precio:2200,cv:200,color:'hue-rotate(55deg) saturate(2.5) brightness(1.3) drop-shadow(0 0 8px #ffdd00)'}, // amarillo oro
-  {id:'c8',nombre:'Ducati Panigale',emoji:'🏍️',precio:2800,cv:220,color:'hue-rotate(25deg) saturate(2) brightness(1.2) drop-shadow(0 0 6px #ff8800)'}, // naranja intenso
-  {id:'c9',nombre:'Audi RS6',emoji:'🏎️',precio:3200,cv:600,color:'hue-rotate(180deg) saturate(2) brightness(1.2) drop-shadow(0 0 6px #00ffff)'}, // cian
-  {id:'c10',nombre:'Nissan GTR',emoji:'🏎️',precio:3500,cv:565,color:'hue-rotate(90deg) saturate(2) brightness(1.2) drop-shadow(0 0 6px #88ff00)'}, // verde lima
-  {id:'c11',nombre:'McLaren 720S',emoji:'🏎️',precio:4200,cv:720,color:'hue-rotate(15deg) saturate(2) brightness(1.2) drop-shadow(0 0 6px #ff6600)'}, // naranja fuego
-  // SUPERCOCHES PREMIO MAYOR con glow mas potente
-  {id:'c12',nombre:'Ferrari SF90 Stradale',emoji:'🏎️',precio:8500,cv:1000,color:'hue-rotate(0deg) saturate(2.5) brightness(1.3) drop-shadow(0 0 10px #ff0000)'}, // rojo neon
-  {id:'c13',nombre:'Lamborghini Aventador SVJ',emoji:'🏎️',precio:8000,cv:770,color:'hue-rotate(55deg) saturate(2.5) brightness(1.3) drop-shadow(0 0 10px #ffdd00)'}, // amarillo oro
-  {id:'c14',nombre:'Koenigsegg Jesko Absolut',emoji:'🏎️',precio:14000,cv:1600,color:'hue-rotate(270deg) saturate(2.5) brightness(1.3) drop-shadow(0 0 10px #aa00ff)'},// violeta royal
-  {id:'c15',nombre:'Porsche 918 Spyder',emoji:'🏎️',precio:9500,cv:887,color:'hue-rotate(130deg) saturate(2.5) brightness(1.3) drop-shadow(0 0 10px #00ff88)'}, // verde esmeralda
-  {id:'c16',nombre:'McLaren P1 GTR',emoji:'🏎️',precio:9000,cv:916,color:'hue-rotate(35deg) saturate(2.5) brightness(1.3) drop-shadow(0 0 10px #ff8800)'}, // naranja neon
-  {id:'c17',nombre:'Bugatti Bolide',emoji:'🏎️',precio:16000,cv:1825,color:'hue-rotate(200deg) saturate(2.5) brightness(1.3) drop-shadow(0 0 10px #00d4ff)'} // azul electrico
+  {id:'c4',nombre:'Tesla Model S',emoji:'⚡',precio:2000,cv:670,color:'hue-rotate(210deg) saturate(2) brightness(1.2) drop-shadow(0 0 6px #00d4ff)'},
+  {id:'c5',nombre:'Porsche 911',emoji:'🏎️',precio:2500,cv:450,color:'hue-rotate(130deg) saturate(2) brightness(1.2) drop-shadow(0 0 6px #00ff88)'},
+  {id:'c6',nombre:'Bugatti Chiron',emoji:'🏎️',precio:5000,cv:1500,color:'hue-rotate(200deg) saturate(2) brightness(1.2) drop-shadow(0 0 6px #00c8ff)'},
+  {id:'c7',nombre:'Yamaha R1',emoji:'🏍️',precio:2200,cv:200,color:'hue-rotate(55deg) saturate(2.5) brightness(1.3) drop-shadow(0 0 8px #ffdd00)'},
+  {id:'c8',nombre:'Ducati Panigale',emoji:'🏍️',precio:2800,cv:220,color:'hue-rotate(25deg) saturate(2) brightness(1.2) drop-shadow(0 0 6px #ff8800)'},
+  {id:'c9',nombre:'Audi RS6',emoji:'🏎️',precio:3200,cv:600,color:'hue-rotate(180deg) saturate(2) brightness(1.2) drop-shadow(0 0 6px #00ffff)'},
+  {id:'c10',nombre:'Nissan GTR',emoji:'🏎️',precio:3500,cv:565,color:'hue-rotate(90deg) saturate(2) brightness(1.2) drop-shadow(0 0 6px #88ff00)'},
+  {id:'c11',nombre:'McLaren 720S',emoji:'🏎️',precio:4200,cv:720,color:'hue-rotate(15deg) saturate(2) brightness(1.2) drop-shadow(0 0 6px #ff6600)'},
+  {id:'c12',nombre:'Ferrari SF90 Stradale',emoji:'🏎️',precio:8500,cv:1000,color:'hue-rotate(0deg) saturate(2.5) brightness(1.3) drop-shadow(0 0 10px #ff0000)'},
+  {id:'c13',nombre:'Lamborghini Aventador SVJ',emoji:'🏎️',precio:8000,cv:770,color:'hue-rotate(55deg) saturate(2.5) brightness(1.3) drop-shadow(0 0 10px #ffdd00)'},
+  {id:'c14',nombre:'Koenigsegg Jesko Absolut',emoji:'🏎️',precio:14000,cv:1600,color:'hue-rotate(270deg) saturate(2.5) brightness(1.3) drop-shadow(0 0 10px #aa00ff)'},
+  {id:'c15',nombre:'Porsche 918 Spyder',emoji:'🏎️',precio:9500,cv:887,color:'hue-rotate(130deg) saturate(2.5) brightness(1.3) drop-shadow(0 0 10px #00ff88)'},
+  {id:'c16',nombre:'McLaren P1 GTR',emoji:'🏎️',precio:9000,cv:916,color:'hue-rotate(35deg) saturate(2.5) brightness(1.3) drop-shadow(0 0 10px #ff8800)'},
+  {id:'c17',nombre:'Bugatti Bolide',emoji:'🏎️',precio:16000,cv:1825,color:'hue-rotate(200deg) saturate(2.5) brightness(1.3) drop-shadow(0 0 10px #00d4ff)'}
 ];
 
 const ACCESORIOS = [
-  // Mecanica / Potencia
   {id:'a1',nombre:'Turbo',emoji:'💨',precio:300,hp:50},
   {id:'a2',nombre:'Nitro',emoji:'🔥',precio:600,hp:80},
   {id:'a3',nombre:'Motor Electrico',emoji:'⚡',precio:800,hp:100},
@@ -287,15 +193,11 @@ const ACCESORIOS = [
   {id:'a6',nombre:'Cadena Reforzada',emoji:'⛓️',precio:350,hp:30},
   {id:'a7',nombre:'Engranajes Sport',emoji:'⚙️',precio:300,hp:25},
   {id:'a8',nombre:'Tornillos Racing',emoji:'🔩',precio:200,hp:15},
-
-  // Ruedas / Adherencia
   {id:'a9',nombre:'Neumaticos Slick',emoji:'🛞',precio:400,hp:35},
   {id:'a10',nombre:'Neumaticos Lluvia',emoji:'🛞',precio:350,hp:30},
   {id:'a11',nombre:'Cadenas Nieve',emoji:'❄️',precio:300,hp:25},
   {id:'a12',nombre:'Llantas Racing',emoji:'🔲',precio:500,hp:40},
   {id:'a13',nombre:'Eje Equilibrado',emoji:'🎯',precio:250,hp:20},
-
-  // Aerodinamica / Exterior
   {id:'a14',nombre:'Aleron GT',emoji:'🔰',precio:400,hp:40},
   {id:'a15',nombre:'Aleron F1',emoji:'🏁',precio:700,hp:70},
   {id:'a16',nombre:'Cristales Tintados',emoji:'🪟',precio:200,hp:10},
@@ -303,16 +205,12 @@ const ACCESORIOS = [
   {id:'a18',nombre:'Faros Laser',emoji:'🔦',precio:600,hp:50},
   {id:'a19',nombre:'Retrovisor Racing',emoji:'🪞',precio:200,hp:10},
   {id:'a20',nombre:'Defensa Reforzada',emoji:'🛡️',precio:450,hp:35},
-
-  // Interior / Piloto
   {id:'a21',nombre:'Asiento Bucket',emoji:'🪑',precio:400,hp:25},
   {id:'a22',nombre:'Volante Racing',emoji:'🎛️',precio:350,hp:20},
   {id:'a23',nombre:'Cuadro Digital',emoji:'📊',precio:500,hp:30},
   {id:'a24',nombre:'Guantes Piloto',emoji:'🧤',precio:150,hp:10},
   {id:'a25',nombre:'Casco Racing',emoji:'🪖',precio:300,hp:15},
   {id:'a26',nombre:'Intercom',emoji:'🎧',precio:250,hp:10},
-
-  // Estetica / Detalles Lujo
   {id:'a27',nombre:'Vinilo Llamas',emoji:'🎨',precio:300,hp:10},
   {id:'a28',nombre:'Vinilo Cromo',emoji:'🌈',precio:500,hp:15},
   {id:'a29',nombre:'Pintura Metalizada',emoji:'✨',precio:600,hp:20},
@@ -322,49 +220,74 @@ const ACCESORIOS = [
   {id:'a33',nombre:'Cohete',emoji:'🚀',precio:600,hp:15},
   {id:'a34',nombre:'Diamante',emoji:'💎',precio:1200,hp:5},
   {id:'a35',nombre:'Rayo',emoji:'⚡',precio:700,hp:20},
-  {id:'a36',nombre:'Fuego',emoji:'🔥',precio:500,hp:15},
+  {id:'a36',nombre:'Fuego',emoji:'🔥',precio:500,hp:15}
 ];
 
-// === BLOQUE 2: FUNCIONES UI + LÓGICA TEST/SIT/EXAMEN ===
+const EMOJI_TIENDA = [
+  {id:'e1',nombre:'Corona',emoji:'👑',precio:500},
+  {id:'e2',nombre:'Diamante',emoji:'💎',precio:800},
+  {id:'e3',nombre:'Fuego',emoji:'🔥',precio:300},
+  {id:'e4',nombre:'Rayo',emoji:'⚡',precio:400},
+  {id:'e5',nombre:'Unicornio',emoji:'🦄',precio:1000}
+];
 
-// Esperar a que los datos estén cargados
-function datosListos() {
-  return window.preguntas_senales &&
-         window.preguntas_normas &&
-         window.preguntas_mecanica &&
-         window.preguntas_auxilios &&
-         window.preguntas_medioambiente;
+// ===== HELPERS =====
+function getPreguntas(cat) {
+  const key = 'preguntas_' + cat;
+  return window[key] || [];
 }
 
-// Subtabs globales - CRÍTICO para que no dé ReferenceError
-window.cambiarSubTab = function(tab) {
-  document.querySelectorAll('.subtab-btn').forEach(btn => btn.classList.remove('active'));
-  document.querySelectorAll('.subtab-content').forEach(c => c.classList.remove('active'));
-
-  document.querySelector(`[data-subtab="${tab}"]`)?.classList.add('active');
-  document.getElementById(`subtab-${tab}`)?.classList.add('active');
-
-  if(typeof window.cargarPregunta === 'function') window.cargarPregunta(tab);
+function getSituaciones(cat) {
+  const key = 'preguntas_situaciones';
+  return window[key] && window[key][cat]? window[key][cat] : [];
 }
 
-// Categorías Situaciones - global
-window.cambiarCategoriaSit = function(cat) {
-  window.sitCategoriaActiva = cat;
-  document.querySelectorAll('#tab-situaciones.category-btn').forEach(btn => btn.classList.remove('active'));
-  if(event && event.target) event.target.classList.add('active');
-
-  const titulos = {
-    clima: '🌧️ CASOS REALES - CLIMA ADVERSO',
-    urbano: '🏙️ CASOS REALES - URBANO',
-    carretera: '🛣️ CASOS REALES - CARRETERA',
-    emergencia: '🚨 CASOS REALES - EMERGENCIA'
-  };
-  document.getElementById('sit-titulo').textContent = titulos[cat];
-  window.estado.sit[cat].idx = 0;
-  window.cargarSituacion(cat);
+function getSVG(id) {
+  return window.senales_svg && window.senales_svg[id]? window.senales_svg[id] : '';
 }
 
-window.mostrarEmoji = function(acierto, element) {
+function barajarArray(arr) {
+  const a = arr.slice();
+  for(let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// ===== INIT =====
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
+
+function init() {
+  console.log("GasDrive V9.0 ES cargado");
+  mostrarIntro();
+  actualizarCoins();
+  cargarPregunta('senales');
+  cargarPregunta('normas');
+  cargarPregunta('mecanica');
+  cargarPregunta('auxilios');
+  cargarPregunta('medioambiente');
+  cargarSituacion('clima');
+  actualizarMensajeMotivacional();
+}
+
+function guardar() {
+  localStorage.setItem('gd_coins', estado.coins);
+  localStorage.setItem('gd_coches', JSON.stringify(estado.coches));
+  localStorage.setItem('gd_accesorios', JSON.stringify(estado.accesorios));
+  localStorage.setItem('gd_emojis', JSON.stringify(estado.emojis));
+}
+
+function actualizarCoins() {
+  const el = document.getElementById('coins');
+  if(el) el.textContent = `💰 ${estado.coins}`;
+}
+
+function mostrarEmoji(acierto, element) {
   const lista = acierto? EMOJIS_ACIERTO : EMOJIS_FALLO;
   const emoji = lista[Math.floor(Math.random() * lista.length)];
   const span = document.createElement('span');
@@ -376,29 +299,71 @@ window.mostrarEmoji = function(acierto, element) {
   if(navigator.vibrate) navigator.vibrate(acierto? [30,20,30] : 100);
 }
 
-// TEST - 5 CATEGORÍAS
-window.cargarPregunta = function(cat) {
-  const s = window.estado.test[cat];
-  const preguntas = window.barajarArray(window.getPreguntas(cat));
+// ===== TABS =====
+function cambiarTab(e, tab) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  e.target.closest('.tab-btn').classList.add('active');
 
-  // FIX: Si no hay preguntas, esperar 100ms y reintentar
+  if(tab === 'garage') cargarGaraje();
+  if(tab === 'tienda') cargarTienda();
+  if(tab === 'tips') cargarTips();
+  if(tab === 'temario') cargarTemario();
+  if(tab === 'test') cargarPregunta('senales');
+  if(tab === 'situaciones') cargarSituacion(sitCategoriaActiva);
+}
+
+// UN SOLO cambiarSubTab - FIX BUG DUPLICACIÓN
+function cambiarSubTab(e, tab, sub) {
+  const tabId = tab === 'sit'? 'situaciones' : tab;
+  const contenedor = document.getElementById('tab-' + tabId);
+  if(!contenedor) return;
+  contenedor.querySelectorAll('.sub-tab-btn').forEach(b => b.classList.remove('active'));
+  contenedor.querySelectorAll('.sub-content').forEach(c => c.classList.remove('active'));
+  e.target.classList.add('active');
+  document.getElementById(`${tab === 'test'? 'test' : 'sit'}-${sub}`).classList.add('active');
+  if(tab === 'test') cargarPregunta(sub);
+  if(tab === 'sit') cargarSituacion(sub);
+}
+
+function cambiarCategoriaSit(cat) {
+  sitCategoriaActiva = cat;
+  document.querySelectorAll('#tab-situaciones.sub-tab-btn').forEach(btn => btn.classList.remove('active'));
+  if(event && event.target) event.target.classList.add('active');
+
+  const titulos = {
+    clima: '🌧️ CASOS REALES - CLIMA ADVERSO',
+    urbano: '🏙️ CASOS REALES - URBANO',
+    carretera: '🛣️ CASOS REALES - CARRETERA',
+    emergencia: '🚨 CASOS REALES - EMERGENCIA'
+  };
+  document.getElementById('sit-titulo').textContent = titulos[cat];
+  estado.sit[cat].idx = 0;
+  cargarSituacion(cat);
+}
+
+// ===== TEST - 5 CATEGORÍAS =====
+function cargarPregunta(cat) {
+  const s = estado.test[cat];
+  const preguntas = barajarArray(getPreguntas(cat));
+
   if(!preguntas || preguntas.length === 0) {
     console.log('Esperando datos para', cat);
-    setTimeout(() => window.cargarPregunta(cat), 100);
+    setTimeout(() => cargarPregunta(cat), 100);
     return;
   }
 
   const pOriginal = preguntas[s.idx % preguntas.length];
-  const opcionesBarajadas = window.barajarArray(pOriginal.a);
+  const opcionesBarajadas = barajarArray(pOriginal.a);
   const textoCorrecto = pOriginal.a[pOriginal.ok];
   const nuevoIndexCorrecto = opcionesBarajadas.indexOf(textoCorrecto);
   const p = {...pOriginal, a: opcionesBarajadas, ok: nuevoIndexCorrecto};
   s.current = p;
 
-  // FIX: Check que el elemento existe antes de usarlo
   const preguntaEl = document.getElementById(`test-${cat}-pregunta`);
   if(!preguntaEl) {
-    console.error('No existe test-${cat}-pregunta');
+    console.error(`No existe test-${cat}-pregunta`);
     return;
   }
 
@@ -410,8 +375,8 @@ window.cargarPregunta = function(cat) {
 
   const imgCont = document.getElementById(`test-${cat}-imagen`);
   if(imgCont) {
-    if(cat === 'senales' && p.img) {
-      const svg = window.getSVG(p.img);
+    if(cat === 'senales' && p.codigo) {
+      const svg = getSVG(p.codigo);
       imgCont.innerHTML = svg;
       imgCont.style.display = svg? 'block' : 'none';
     } else {
@@ -421,10 +386,7 @@ window.cargarPregunta = function(cat) {
   }
 
   const cont = document.getElementById(`test-${cat}-opciones`);
-  if(!cont) {
-    console.error('No existe test-${cat}-opciones');
-    return;
-  }
+  if(!cont) return;
 
   cont.innerHTML = '';
   document.getElementById(`test-${cat}-feedback`).textContent = '';
@@ -434,19 +396,18 @@ window.cargarPregunta = function(cat) {
     const div = document.createElement('div');
     div.className = 'opcio';
     div.textContent = txt;
-    div.onclick = function() { window.responderTest(cat, i, this); };
+    div.onclick = function() { responderTest(cat, i, this); };
     cont.appendChild(div);
   });
 
-  // Quitar "Cargando datos..." cuando cargue la primera pregunta
   const motEl = document.getElementById('motivacion');
   if(motEl && motEl.textContent === 'Cargando datos...') {
-    window.actualizarMensajeMotivacional();
+    actualizarMensajeMotivacional();
   }
 }
 
-window.responderTest = function(cat, idx, el) {
-  const s = window.estado.test[cat];
+function responderTest(cat, idx, el) {
+  const s = estado.test[cat];
   const p = s.current;
   const cont = document.getElementById(`test-${cat}-opciones`);
   if(cont.querySelector('.correcta') || cont.querySelector('.incorrecta')) return;
@@ -458,46 +419,49 @@ window.responderTest = function(cat, idx, el) {
     s.aciertos++;
     s.racha++;
     s.puntuacion += 10 + (s.racha * 2);
-    window.estado.coins += 5;
+    estado.coins += 5;
     document.getElementById(`test-${cat}-feedback`).className = 'feedback acierto';
     document.getElementById(`test-${cat}-feedback`).textContent = `✅ ¡CORRECTO! +${10+(s.racha*2)} pts`;
-    window.mostrarEmoji(true, el);
+    mostrarEmoji(true, el);
   } else {
     el.classList.add('incorrecta');
     cont.querySelectorAll('.opcio')[p.ok].classList.add('correcta');
     document.getElementById(`test-${cat}-feedback`).className = 'feedback fallo';
     document.getElementById(`test-${cat}-feedback`).textContent = '❌ FALLO';
-    window.mostrarEmoji(false, el);
+    mostrarEmoji(false, el);
     s.racha = 0;
   }
   document.getElementById(`btn-sig-test-${cat}`).disabled = false;
-  window.actualizarCoins();
-  window.guardar();
+  actualizarCoins();
+  guardar();
 }
 
-window.siguienteTest = function(e, cat) {
-  window.estado.test[cat].idx++;
-  window.cargarPregunta(cat);
+function siguienteTest(e, cat) {
+  estado.test[cat].idx++;
+  cargarPregunta(cat);
 }
 
-// CASOS - 4 categorías
-window.cargarSituacion = function(cat) {
-  if(!cat) cat = window.sitCategoriaActiva;
-  const s = window.estado.sit[cat];
-  const casos = window.barajarArray(window.getSituaciones(cat));
+// ===== CASOS - 4 CATEGORÍAS =====
+function cargarSituacion(cat) {
+  if(!cat) cat = sitCategoriaActiva;
+  const s = estado.sit[cat];
+  const casos = barajarArray(getSituaciones(cat));
   if(!casos || casos.length === 0) {
-    setTimeout(() => window.cargarSituacion(cat), 100);
+    setTimeout(() => cargarSituacion(cat), 100);
     return;
   }
 
   const pOriginal = casos[s.idx % casos.length];
-  const opcionesBarajadas = window.barajarArray(pOriginal.a);
+  const opcionesBarajadas = barajarArray(pOriginal.a);
   const textoCorrecto = pOriginal.a[pOriginal.ok];
   const nuevoIndexCorrecto = opcionesBarajadas.indexOf(textoCorrecto);
   const p = {...pOriginal, a: opcionesBarajadas, ok: nuevoIndexCorrecto};
   s.current = p;
 
-  document.getElementById(`sit-${cat}-pregunta`).textContent = p.q;
+  const preguntaEl = document.getElementById(`sit-${cat}-pregunta`);
+  if(!preguntaEl) return;
+
+  preguntaEl.textContent = p.q;
   document.getElementById(`sit-${cat}-aciertos`).textContent = s.aciertos;
   document.getElementById(`sit-${cat}-score`).textContent = s.puntuacion;
   document.getElementById(`sit-${cat}-progress`).style.width = `${((s.idx % casos.length)/casos.length)*100}%`;
@@ -513,13 +477,13 @@ window.cargarSituacion = function(cat) {
     const div = document.createElement('div');
     div.className = 'opcio';
     div.textContent = txt;
-    div.onclick = function() { window.responderSituacion(cat, i, this); };
+    div.onclick = function() { responderSituacion(cat, i, this); };
     cont.appendChild(div);
   });
 }
 
-window.responderSituacion = function(cat, idx, el) {
-  const s = window.estado.sit[cat];
+function responderSituacion(cat, idx, el) {
+  const s = estado.sit[cat];
   const p = s.current;
   const cont = document.getElementById(`sit-${cat}-opciones`);
   if(cont.querySelector('.correcta') || cont.querySelector('.incorrecta')) return;
@@ -530,36 +494,35 @@ window.responderSituacion = function(cat, idx, el) {
     el.classList.add('correcta');
     s.aciertos++;
     s.puntuacion += 15;
-    window.estado.coins += 10;
+    estado.coins += 10;
     document.getElementById(`sit-${cat}-feedback`).className = 'feedback acierto';
     document.getElementById(`sit-${cat}-feedback`).textContent = `✅ ¡CORRECTO! +15 pts`;
-    window.mostrarEmoji(true, el);
+    mostrarEmoji(true, el);
   } else {
     el.classList.add('incorrecta');
     cont.querySelectorAll('.opcio')[p.ok].classList.add('correcta');
     document.getElementById(`sit-${cat}-feedback`).className = 'feedback fallo';
     document.getElementById(`sit-${cat}-feedback`).textContent = '❌ FALLO';
-    window.mostrarEmoji(false, el);
+    mostrarEmoji(false, el);
   }
   document.getElementById(`btn-sig-sit-${cat}`).disabled = false;
-  window.actualizarCoins();
-  window.guardar();
+  actualizarCoins();
+  guardar();
 }
 
-window.siguienteSituacion = function(e, cat) {
-  window.estado.sit[cat].idx++;
-  window.cargarSituacion(cat);
+function siguienteSituacion(e, cat) {
+  estado.sit[cat].idx++;
+  cargarSituacion(cat);
 }
 
-// EXAMEN - todas las categorías
-window.iniciarExamen = function(e) {
+// ===== EXAMEN OFICIAL =====
+function iniciarExamen(e) {
   const todas = [
- ...window.getPreguntas('senales'),
- ...window.getPreguntas('normas'),
- ...window.getPreguntas('mecanica'),
- ...window.getPreguntas('auxilios'),
- ...window.getPreguntas('medioambiente'),
- ...window.getSituaciones('clima')
+  ...getPreguntas('senales'),
+  ...getPreguntas('normas'),
+  ...getPreguntas('mecanica'),
+  ...getPreguntas('auxilios'),
+  ...getPreguntas('medioambiente')
   ];
 
   if(todas.length < 30) {
@@ -567,107 +530,111 @@ window.iniciarExamen = function(e) {
     return;
   }
 
-  window.estado.examen.preguntas = window.barajarArray(todas).slice(0, 30);
-  window.estado.examen.activa = true;
-  window.estado.examen.index = 0;
-  window.estado.examen.aciertos = 0;
-  window.estado.examen.fallos = 0;
-  window.estado.examen.categoria = 'senales';
+  estado.examen.preguntas = barajarArray(todas).slice(0, 30);
+  estado.examen.index = 0;
+  estado.examen.aciertos = 0;
+  estado.examen.fallos = 0;
+  estado.examen.tiempo = 1800;
 
   document.getElementById('btn-iniciar-examen').style.display = 'none';
   document.getElementById('btn-sig-examen').style.display = 'block';
-  window.iniciarTimerExamen();
-  window.cargarPreguntaExamen();
+  document.getElementById('examen-resultado').style.display = 'none';
+
+  iniciarTimerExamen();
+  cargarPreguntaExamen();
 }
 
-window.iniciarTimerExamen = function() {
-  clearInterval(window.estado.examen.timer);
-  window.estado.examen.tiempo = 1800;
-  window.estado.examen.timer = setInterval(() => {
-    window.estado.examen.tiempo--;
-    const min = Math.floor(window.estado.examen.tiempo / 60);
-    const seg = window.estado.examen.tiempo % 60;
+function iniciarTimerExamen() {
+  clearInterval(estado.examen.timer);
+  estado.examen.timer = setInterval(() => {
+    estado.examen.tiempo--;
+    const min = Math.floor(estado.examen.tiempo / 60);
+    const seg = estado.examen.tiempo % 60;
     document.getElementById('examen-timer').textContent =
       `${min.toString().padStart(2,'0')}:${seg.toString().padStart(2,'0')}`;
-    if(window.estado.examen.tiempo <= 0) window.finalizarExamen();
+    if(estado.examen.tiempo <= 0) finalizarExamen();
   }, 1000);
 }
 
-window.cargarPreguntaExamen = function() {
-  if(window.estado.examen.index >= 30) return window.finalizarExamen();
-  const pOriginal = window.estado.examen.preguntas[window.estado.examen.index];
-  const opcionesBarajadas = window.barajarArray(pOriginal.a);
+function cargarPreguntaExamen() {
+  if(estado.examen.index >= 30) return finalizarExamen();
+
+  const pOriginal = estado.examen.preguntas[estado.examen.index];
+  const opcionesBarajadas = barajarArray(pOriginal.a);
   const textoCorrecto = pOriginal.a[pOriginal.ok];
   const nuevoIndexCorrecto = opcionesBarajadas.indexOf(textoCorrecto);
   const p = {...pOriginal, a: opcionesBarajadas, ok: nuevoIndexCorrecto};
-  window.estado.examen.preguntas[window.estado.examen.index] = p;
+  estado.examen.preguntas[estado.examen.index] = p;
 
-  document.getElementById('examen-num').textContent = window.estado.examen.index + 1;
-  document.getElementById('examen-aciertos').textContent = window.estado.examen.aciertos;
-  document.getElementById('examen-progress').style.width = `${(window.estado.examen.index/30)*100}%`;
-  document.getElementById('examen-pregunta').textContent = p.q;
+  document.getElementById('examen-num').textContent = estado.examen.index + 1;
+  document.getElementById('examen-aciertos').textContent = estado.examen.aciertos;
+  document.getElementById('examen-progress').style.width = `${(estado.examen.index/30)*100}%`;
 
-  const imgExamen = document.getElementById('examen-imagen');
-  if(imgExamen) {
-    if(p.img && p.id && p.id.startsWith('s')) {
-      imgExamen.innerHTML = window.getSVG(p.img);
-      imgExamen.style.display = 'block';
-    } else {
-      imgExamen.innerHTML = '';
-      imgExamen.style.display = 'none';
-    }
+  const cont = document.getElementById('examen-pregunta');
+  const opCont = document.getElementById('examen-opciones');
+  const imgCont = document.getElementById('examen-imagen');
+
+  if(!cont ||!opCont) return;
+
+  cont.textContent = p.q;
+  opCont.innerHTML = '';
+
+  if(p.codigo && window.senales_svg && window.senales_svg[p.codigo] && imgCont) {
+    imgCont.innerHTML = window.senales_svg[p.codigo];
+    imgCont.style.display = 'block';
+  } else if(imgCont) {
+    imgCont.innerHTML = '';
+    imgCont.style.display = 'none';
   }
-
-  const cont = document.getElementById('examen-opciones');
-  cont.innerHTML = '';
-  document.getElementById('btn-sig-examen').disabled = true;
 
   p.a.forEach((txt, i) => {
     const div = document.createElement('div');
     div.className = 'opcio';
     div.textContent = txt;
-    div.onclick = function() { window.responderExamen(i, this); };
-    cont.appendChild(div);
+    div.onclick = () => responderExamen(i);
+    opCont.appendChild(div);
   });
+
+  document.getElementById('btn-sig-examen').disabled = true;
 }
 
-window.responderExamen = function(idx, el) {
-  const p = window.estado.examen.preguntas[window.estado.examen.index];
-  const cont = document.getElementById('examen-opciones');
-  if(cont.querySelector('.correcta') || cont.querySelector('.incorrecta')) return;
-  cont.querySelectorAll('.opcio').forEach(o => o.classList.add('bloquejada'));
+function responderExamen(idx) {
+  const p = estado.examen.preguntas[estado.examen.index];
+  const ops = document.querySelectorAll('#examen-opciones.opcio');
+  if(ops[0].classList.contains('bloquejada')) return;
 
-  const correcto = idx === p.ok;
-  if(correcto) {
-    el.classList.add('correcta');
-    window.estado.examen.aciertos++;
-    window.estado.coins += 20;
-    window.mostrarEmoji(true, el);
+  ops.forEach(o => o.classList.add('bloquejada'));
+
+  if(idx === p.ok) {
+    ops[idx].classList.add('correcta');
+    estado.examen.aciertos++;
+    estado.coins += 20;
+    mostrarEmoji(true, ops[idx]);
   } else {
-    el.classList.add('incorrecta');
-    cont.querySelectorAll('.opcio')[p.ok].classList.add('correcta');
-    window.estado.examen.fallos++;
-    window.mostrarEmoji(false, el);
+    ops[idx].classList.add('incorrecta');
+    ops[p.ok].classList.add('correcta');
+    estado.examen.fallos++;
+    mostrarEmoji(false, ops[idx]);
   }
+
   document.getElementById('btn-sig-examen').disabled = false;
-  document.getElementById('examen-aciertos').textContent = window.estado.examen.aciertos;
-  window.actualizarCoins();
-  window.guardar();
+  document.getElementById('examen-aciertos').textContent = estado.examen.aciertos;
+  actualizarCoins();
+  guardar();
 }
 
-window.siguientePreguntaExamen = function(e) {
-  window.estado.examen.index++;
-  if(window.estado.examen.index >= 30) {
-    window.finalizarExamen();
+function siguientePreguntaExamen(e) {
+  estado.examen.index++;
+  if(estado.examen.index >= 30) {
+    finalizarExamen();
   } else {
-    window.cargarPreguntaExamen();
+    cargarPreguntaExamen();
   }
 }
 
-window.finalizarExamen = function() {
-  clearInterval(window.estado.examen.timer);
-  window.estado.examen.activa = false;
-  const nota = window.estado.examen.aciertos;
+function finalizarExamen() {
+  clearInterval(estado.examen.timer);
+  const nota = estado.examen.aciertos;
   const aprobado = nota >= 27;
   const res = document.getElementById('examen-resultado');
   res.style.display = 'block';
@@ -676,25 +643,27 @@ window.finalizarExamen = function() {
     res.innerHTML = `
       <h2 style="color:#2ecc71">✅ ¡APROBADO!</h2>
       <p style="font-size:24px">${nota}/30</p>
-      <p>Aciertos: ${nota} | Fallos: ${window.estado.examen.fallos}</p>
+      <p>Aciertos: ${nota} | Fallos: ${estado.examen.fallos}</p>
       <p>Has ganado +${nota*20} coins</p>
-      <button class="btn" onclick="window.reiniciarExamen()">Hacer otro examen</button>
+      <button class="btn" onclick="reiniciarExamen()">Hacer otro examen</button>
     `;
-    window.estado.coins += nota * 20;
+    estado.coins += nota * 20;
   } else {
     res.innerHTML = `
       <h2 style="color:#e74c3c">❌ SUSPENSO</h2>
       <p style="font-size:24px">${nota}/30</p>
-      <p>Aciertos: ${nota} | Fallos: ${window.estado.examen.fallos}</p>
+      <p>Aciertos: ${nota} | Fallos: ${estado.examen.fallos}</p>
       <p>Necesitas 27 aciertos mínimo</p>
-      <button class="btn" onclick="window.reiniciarExamen()">Volver a probar</button>
+      <button class="btn" onclick="reiniciarExamen()">Volver a probar</button>
     `;
   }
-  window.actualizarCoins();
-  window.guardar();
+
+  document.getElementById('btn-sig-examen').style.display = 'none';
+  actualizarCoins();
+  guardar();
 }
 
-window.reiniciarExamen = function() {
+function reiniciarExamen() {
   document.getElementById('examen-resultado').style.display = 'none';
   document.getElementById('btn-iniciar-examen').style.display = 'block';
   document.getElementById('btn-sig-examen').style.display = 'none';
@@ -708,90 +677,90 @@ window.reiniciarExamen = function() {
   if(imgExamen) imgExamen.innerHTML = '';
 }
 
-// GARAJE + TIENDA + TIPS + TEMARIO
-window.cargarGaraje = function() {
+// ===== GARAJE + TIENDA + TIPS + TEMARIO =====
+function cargarGaraje() {
   const cont = document.getElementById('garage-lista');
+  if(!cont) return;
   cont.innerHTML = '';
   let hpTotal = 90;
-  window.estado.accesorios.forEach(id => {
-    const acc = window.ACCESORIOS && window.ACCESORIOS.find(a => a.id === id);
+  estado.accesorios.forEach(id => {
+    const acc = ACCESORIOS.find(a => a.id === id);
     if(acc) hpTotal += acc.hp;
   });
   document.getElementById('garage-score').textContent = `🏎️ ${hpTotal} CV`;
 
-  (window.COCHES || []).forEach(coche => {
-    const desbloqueado = window.estado.coches.includes(coche.id);
+  COCHES.forEach(coche => {
+    const desbloqueado = estado.coches.includes(coche.id);
     const div = document.createElement('div');
     div.className = 'garage-car' + (desbloqueado? '' : ' locked');
     div.innerHTML = `
       <div style="font-size:40px; filter:${coche.color}">${coche.emoji}</div>
       <div>${coche.nombre}</div>
       <div style="color:#667eea">${coche.cv} CV</div>
-      ${!desbloqueado? `<button class="btn-buy" onclick="window.comprarCoche('${coche.id}')">Comprar ${coche.precio}💰</button>` : '<div style="color:#2ecc71">✓ Propietario</div>'}
+      ${!desbloqueado? `<button class="btn-buy" onclick="comprarCoche('${coche.id}')">Comprar ${coche.precio}💰</button>` : '<div style="color:#2ecc71">✓ Propietario</div>'}
     `;
     cont.appendChild(div);
   });
 }
 
-window.comprarCoche = function(id) {
-  const coche = (window.COCHES || []).find(c => c.id === id);
-  if(!coche) return;
-  if(window.estado.coins < coche.precio) {
+function comprarCoche(id) {
+  const coche = COCHES.find(c => c.id === id);
+  if(!coche || estado.coins < coche.precio) {
     alert('No tienes suficientes coins');
     return;
   }
-  window.estado.coins -= coche.precio;
-  window.estado.coches.push(id);
-  window.guardar();
-  window.actualizarCoins();
-  window.cargarGaraje();
+  estado.coins -= coche.precio;
+  estado.coches.push(id);
+  guardar();
+  actualizarCoins();
+  cargarGaraje();
 }
 
-window.cargarTienda = function() {
+function cargarTienda() {
   const cont = document.getElementById('emoji-tienda');
+  if(!cont) return;
   cont.innerHTML = '';
 
-  (window.ACCESORIOS || []).forEach(acc => {
-    const comprado = window.estado.accesorios.includes(acc.id);
+  ACCESORIOS.forEach(acc => {
+    const comprado = estado.accesorios.includes(acc.id);
     const div = document.createElement('div');
     div.className = 'emoji-item' + (comprado? ' locked' : '');
     div.innerHTML = `
       <div style="font-size:40px">${acc.emoji}</div>
       <div>${acc.nombre}</div>
       <div style="color:#667eea">+${acc.hp} CV</div>
-      ${!comprado? `<button class="btn-buy" onclick="window.comprarAccesorios('${acc.id}')">Comprar ${acc.precio}💰</button>` : '<div style="color:#2ecc71">✓ Comprado</div>'}
+      ${!comprado? `<button class="btn-buy" onclick="comprarAccesorios('${acc.id}')">Comprar ${acc.precio}💰</button>` : '<div style="color:#2ecc71">✓ Comprado</div>'}
     `;
     cont.appendChild(div);
   });
 
-  (window.EMOJI_TIENDA || []).forEach(emoji => {
-    const comprado = window.estado.emojis.includes(emoji.id);
+  EMOJI_TIENDA.forEach(emoji => {
+    const comprado = estado.emojis.includes(emoji.id);
     const div = document.createElement('div');
     div.className = 'emoji-item' + (comprado? ' locked' : '');
     div.innerHTML = `
       <div style="font-size:40px">${emoji.emoji}</div>
       <div>${emoji.nombre}</div>
       <div style="color:#667eea">Cosmético</div>
-      ${!comprado? `<button class="btn-buy" onclick="window.comprarEmoji('${emoji.id}')">Comprar ${emoji.precio}💰</button>` : '<div style="color:#2ecc71">✓ Comprado</div>'}
+      ${!comprado? `<button class="btn-buy" onclick="comprarEmoji('${emoji.id}')">Comprar ${emoji.precio}💰</button>` : '<div style="color:#2ecc71">✓ Comprado</div>'}
     `;
     cont.appendChild(div);
   });
 }
 
-window.comprarAccesorios = function(id) {
-  const acc = (window.ACCESORIOS || []).find(a => a.id === id);
-  if(!acc) return;
-  if(window.estado.coins < acc.precio) {
+function comprarAccesorios(id) {
+  const acc = ACCESORIOS.find(a => a.id === id);
+  if(!acc || estado.coins < acc.precio) {
     alert('No tienes suficientes coins');
     return;
   }
-  window.estado.coins -= acc.precio;
-  window.estado.accesorios.push(id);
-  window.guardar();
-  window.actualizarCoins();
-  window.cargarTienda();
+  estado.coins -= acc.precio;
+  estado.accesorios.push(id);
+  guardar();
+  actualizarCoins();
+  cargarTienda();
 
-  const totalAcc = window.estado.accesorios.length;
+  const totalAcc = estado.accesorios.length;
   const msg = document.createElement('div');
   msg.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#ff8c00,#ff2d55);color:#fff;padding:12px 24px;border-radius:12px;font-weight:bold;z-index:999;animation:slideUp 0.3s';
   msg.innerHTML = `🏎️ ¡Ya vas creando tu supercoche! ${totalAcc}/42 accesorios`;
@@ -799,70 +768,70 @@ window.comprarAccesorios = function(id) {
   setTimeout(() => msg.remove(), 2000);
 }
 
-window.comprarEmoji = function(id) {
-  const emoji = (window.EMOJI_TIENDA || []).find(e => e.id === id);
-  if(!emoji) return;
-  if(window.estado.coins < emoji.precio) {
+function comprarEmoji(id) {
+  const emoji = EMOJI_TIENDA.find(e => e.id === id);
+  if(!emoji || estado.coins < emoji.precio) {
     alert('No tienes suficientes coins');
     return;
   }
-  window.estado.coins -= emoji.precio;
-  window.estado.emojis.push(id);
-  window.guardar();
-  window.actualizarCoins();
-  window.cargarTienda();
+  estado.coins -= emoji.precio;
+  estado.emojis.push(id);
+  guardar();
+  actualizarCoins();
+  cargarTienda();
 }
 
-window.cargarTips = function() {
-  window.tipsData = window.TIPS || [];
-  window.currentTip = 0;
-  window.mostrarTip();
+function cargarTips() {
+  tipsData = TIPS;
+  currentTip = 0;
+  mostrarTip();
 }
 
-window.mostrarTip = function() {
-  if (window.tipsData.length === 0) return;
-  const tip = window.tipsData[window.currentTip];
+function mostrarTip() {
+  if (tipsData.length === 0) return;
+  const tip = tipsData[currentTip];
   document.getElementById('tip-content').innerHTML = `
     <div class="tip-emoji">${tip.emoji}</div>
     <div class="tip-text">${tip.txt}</div>
   `;
-  document.getElementById('tip-counter').textContent = `${window.currentTip + 1} / ${window.tipsData.length}`;
+  document.getElementById('tip-counter').textContent = `${currentTip + 1} / ${tipsData.length}`;
 }
 
-window.nextTip = function(e) {
-  window.currentTip = (window.currentTip + 1) % window.tipsData.length;
-  window.mostrarTip();
+function nextTip(e) {
+  currentTip = (currentTip + 1) % tipsData.length;
+  mostrarTip();
 }
 
-window.prevTip = function(e) {
-  window.currentTip = (window.currentTip - 1 + window.tipsData.length) % window.tipsData.length;
-  window.mostrarTip();
+function prevTip(e) {
+  currentTip = (currentTip - 1 + tipsData.length) % tipsData.length;
+  mostrarTip();
 }
 
-window.cargarTemario = function() {
+function cargarTemario() {
   const container = document.getElementById('temario-lista');
+  if(!container) return;
   container.innerHTML = `
-    <div class="temario-item" onclick="window.abrirPDF('./01_Senales_Tomo_I_RD_465_2025.pdf')">
+    <div class="temario-item" onclick="abrirPDF('./01_Senales_Tomo_I_RD_465_2025.pdf')">
       <div style="font-size:40px">🚦</div>
       <div>Señales</div>
       <div style="font-size:11px;color:#999">RD 465/2025</div>
     </div>
-    <div class="temario-item" onclick="window.abrirPDF('./02_Normas_Circulacion_Tomo_II_Edicion_2024.pdf')">
+    <div class="temario-item" onclick="abrirPDF('./02_Normas_Circulacion_Tomo_II_Edicion_2024.pdf')">
       <div style="font-size:40px">📋</div>
       <div>Normas Circulación</div>
       <div style="font-size:11px;color:#999">Edición 2024</div>
     </div>
-    <div class="temario-item" onclick="window.abrirPDF('./03_Manual_IX_Primeros_Auxilios_2025.pdf')">
+    <div class="temario-item" onclick="abrirPDF('./03_Manual_IX_Primeros_Auxilios_2025.pdf')">
       <div style="font-size:40px">🚑</div>
       <div>Primeros Auxilios</div>
       <div style="font-size:11px;color:#999">Manual IX 2025</div>
     </div>
-    <div class="temario-item" onclick="window.abrirPDF('./04_Manual_VIII_Mecanica_2024.pdf')">
+    <div class="temario-item" onclick="abrirPDF('./04_Manual_VIII_Mecanica_2024.pdf')">
       <div style="font-size:40px">⚙️</div>
       <div>Mecánica</div>
       <div style="font-size:11px;color:#999">Manual VIII 2025</div>
     </div>
-    <div class="temario-item" onclick="window.abrirPDF('./05_Medio_Ambiente_Distintivos_DGT_2025.pdf')">
+    <div class="temario-item" onclick="abrirPDF('./05_Medio_Ambiente_Distintivos_DGT_2025.pdf')">
       <div style="font-size:40px">♻️</div>
       <div>Medio Ambiente</div>
       <div style="font-size:11px;color:#999">Distintivos DGT 2025</div>
@@ -870,17 +839,17 @@ window.cargarTemario = function() {
   `;
 }
 
-window.abrirPDF = function(ruta) {
+function abrirPDF(ruta) {
   const modal = document.createElement('div');
   modal.id = 'pdf-modal';
   modal.style.cssText = `
     position:fixed;top:0;left:0;right:0;bottom:0;
-    background:#0a0a0a;z-index:9999;
+    background:#0a0a;z-index:9999;
     display:flex;flex-direction:column;
   `;
   modal.innerHTML = `
     <div style="background:#1a1a1a;padding:12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #333">
-      <button onclick="window.cerrarPDF()" style="background:none;border:none;color:#00D9FF;font-size:16px;font-weight:700">← Volver</button>
+      <button onclick="cerrarPDF()" style="background:none;border:none;color:#00D9FF;font-size:16px;font-weight:700">← Volver</button>
       <div style="color:#fff;font-size:15px;font-weight:700">Temario DGT</div>
       <div style="width:60px"></div>
     </div>
@@ -889,12 +858,12 @@ window.abrirPDF = function(ruta) {
   document.body.appendChild(modal);
 }
 
-window.cerrarPDF = function() {
+function cerrarPDF() {
   const modal = document.getElementById('pdf-modal');
   if(modal) modal.remove();
 }
 
-window.actualizarMensajeMotivacional = function() {
+function actualizarMensajeMotivacional() {
   const mensajes = [
     "Vas por buen camino 💪",
     "Cada fallo te hace más fuerte 🔥",
@@ -911,7 +880,7 @@ window.actualizarMensajeMotivacional = function() {
 if('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('./service-worker.js')
-.then(reg => console.log('SW registrado'))
-.catch(err => console.log('SW error:', err));
+    .then(reg => console.log('SW registrado'))
+    .catch(err => console.log('SW error:', err));
   });
 }
