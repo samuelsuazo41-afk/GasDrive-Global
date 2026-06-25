@@ -2,6 +2,9 @@
 const EMOJIS_ACIERTO = ['🚀','💎','👑','🔥','💯','⚡','🏆','🦄','🤑','✅','💪','😎','🎯','💥','🌟','🎉'];
 const EMOJIS_FALLO = ['❌','💀','😭','⛔','💔','😵','🤦','🚫','💩','🤡','💥','😤'];
 
+// CACHE PARA JSON
+const cachePreguntas = {};
+
 // INTRO SCREEN - NO TOCAR
 function mostrarIntro(){
   document.body.insertAdjacentHTML('afterbegin', `
@@ -232,9 +235,20 @@ const EMOJI_TIENDA = [
 ];
 
 // ===== HELPERS =====
-function getPreguntas(cat) {
-  const key = 'preguntas_' + cat;
-  return window[key] || [];
+// CAMBIO 1: getPreguntas ahora lee JSON
+async function getPreguntas(cat) {
+  if (cachePreguntas[cat]) return cachePreguntas[cat];
+  
+  try {
+    const response = await fetch(`/content/preguntas/${cat}.json`);
+    if (!response.ok) throw new Error(`No se encontró ${cat}.json`);
+    const data = await response.json();
+    cachePreguntas[cat] = data;
+    return data;
+  } catch (err) {
+    console.error(`Error cargando ${cat}:`, err);
+    return [];
+  }
 }
 
 function getSituaciones(cat) {
@@ -242,8 +256,9 @@ function getSituaciones(cat) {
   return window[key] && window[key][cat]? window[key][cat] : [];
 }
 
+// CAMBIO 2: getSVG ahora carga archivo
 function getSVG(id) {
-  return window.senales_svg && window.senales_svg[id]? window.senales_svg[id] : '';
+  return `<img src="/content/imagenes/svg/${id}.svg" style="max-width:100%;height:auto">`;
 }
 
 function barajarArray(arr) {
@@ -314,7 +329,6 @@ function cambiarTab(e, tab) {
   if(tab === 'situaciones') cargarSituacion(sitCategoriaActiva);
 }
 
-// UN SOLO cambiarSubTab - FIX BUG DUPLICACIÓN
 function cambiarSubTab(e, tab, sub) {
   const tabId = tab === 'sit'? 'situaciones' : tab;
   const contenedor = document.getElementById('tab-' + tabId);
@@ -344,9 +358,10 @@ function cambiarCategoriaSit(cat) {
 }
 
 // ===== TEST - 5 CATEGORÍAS =====
-function cargarPregunta(cat) {
+// CAMBIO 3: cargarPregunta ahora es async
+async function cargarPregunta(cat) {
   const s = estado.test[cat];
-  const preguntas = barajarArray(getPreguntas(cat));
+  const preguntas = barajarArray(await getPreguntas(cat));
 
   if(!preguntas || preguntas.length === 0) {
     console.log('Esperando datos para', cat);
@@ -355,8 +370,8 @@ function cargarPregunta(cat) {
   }
 
   const pOriginal = preguntas[s.idx % preguntas.length];
-  const opcionesBarajadas = barajarArray(pOriginal.a);
-  const textoCorrecto = pOriginal.a[pOriginal.ok];
+  const opcionesBarajadas = barajarArray(pOriginal.a || pOriginal.opciones);
+  const textoCorrecto = (pOriginal.a || pOriginal.opciones)[pOriginal.ok!== undefined? pOriginal.ok : pOriginal.respuesta_correcta];
   const nuevoIndexCorrecto = opcionesBarajadas.indexOf(textoCorrecto);
   const p = {...pOriginal, a: opcionesBarajadas, ok: nuevoIndexCorrecto};
   s.current = p;
@@ -367,7 +382,7 @@ function cargarPregunta(cat) {
     return;
   }
 
-  preguntaEl.textContent = p.q;
+  preguntaEl.textContent = p.q || p.pregunta;
   document.getElementById(`test-${cat}-aciertos`).textContent = s.aciertos;
   document.getElementById(`test-${cat}-racha`).textContent = s.racha;
   document.getElementById(`test-${cat}-score`).textContent = s.puntuacion;
@@ -375,8 +390,8 @@ function cargarPregunta(cat) {
 
   const imgCont = document.getElementById(`test-${cat}-imagen`);
   if(imgCont) {
-    if(cat === 'senales' && p.codigo) {
-      const svg = getSVG(p.codigo);
+    if(cat === 'senales' && (p.codigo || p.codigo_dgt)) {
+      const svg = getSVG(p.codigo || p.codigo_dgt);
       imgCont.innerHTML = svg;
       imgCont.style.display = svg? 'block' : 'none';
     } else {
@@ -473,7 +488,7 @@ function cargarSituacion(cat) {
   document.getElementById(`sit-${cat}-feedback`).textContent = '';
   document.getElementById(`btn-sig-sit-${cat}`).disabled = true;
 
-  p.a.forEach((txt, i) => {
+   p.a.forEach((txt, i) => {
     const div = document.createElement('div');
     div.className = 'opcio';
     div.textContent = txt;
@@ -516,13 +531,13 @@ function siguienteSituacion(e, cat) {
 }
 
 // ===== EXAMEN OFICIAL =====
-function iniciarExamen(e) {
+async function iniciarExamen(e) {
   const todas = [
-  ...getPreguntas('senales'),
-  ...getPreguntas('normas'),
-  ...getPreguntas('mecanica'),
-  ...getPreguntas('auxilios'),
-  ...getPreguntas('medioambiente')
+  ...await getPreguntas('senales'),
+  ...await getPreguntas('normas'),
+  ...await getPreguntas('mecanica'),
+  ...await getPreguntas('auxilios'),
+  ...await getPreguntas('medioambiente')
   ];
 
   if(todas.length < 30) {
@@ -560,8 +575,8 @@ function cargarPreguntaExamen() {
   if(estado.examen.index >= 30) return finalizarExamen();
 
   const pOriginal = estado.examen.preguntas[estado.examen.index];
-  const opcionesBarajadas = barajarArray(pOriginal.a);
-  const textoCorrecto = pOriginal.a[pOriginal.ok];
+  const opcionesBarajadas = barajarArray(pOriginal.a || pOriginal.opciones);
+  const textoCorrecto = (pOriginal.a || pOriginal.opciones)[pOriginal.ok!== undefined? pOriginal.ok : pOriginal.respuesta_correcta];
   const nuevoIndexCorrecto = opcionesBarajadas.indexOf(textoCorrecto);
   const p = {...pOriginal, a: opcionesBarajadas, ok: nuevoIndexCorrecto};
   estado.examen.preguntas[estado.examen.index] = p;
@@ -576,11 +591,11 @@ function cargarPreguntaExamen() {
 
   if(!cont ||!opCont) return;
 
-  cont.textContent = p.q;
+  cont.textContent = p.q || p.pregunta;
   opCont.innerHTML = '';
 
-  if(p.codigo && window.senales_svg && window.senales_svg[p.codigo] && imgCont) {
-    imgCont.innerHTML = window.senales_svg[p.codigo];
+  if((p.codigo || p.codigo_dgt) && imgCont) {
+    imgCont.innerHTML = getSVG(p.codigo || p.codigo_dgt);
     imgCont.style.display = 'block';
   } else if(imgCont) {
     imgCont.innerHTML = '';
@@ -811,27 +826,27 @@ function cargarTemario() {
   const container = document.getElementById('temario-lista');
   if(!container) return;
   container.innerHTML = `
-    <div class="temario-item" onclick="abrirPDF('./01_Senales_Tomo_I_RD_465_2025.pdf')">
+    <div class="temario-item" onclick="abrirPDF('/content/temario/01-senales/leccion.pdf')">
       <div style="font-size:40px">🚦</div>
       <div>Señales</div>
       <div style="font-size:11px;color:#999">RD 465/2025</div>
     </div>
-    <div class="temario-item" onclick="abrirPDF('./02_Normas_Circulacion_Tomo_II_Edicion_2024.pdf')">
+    <div class="temario-item" onclick="abrirPDF('/content/temario/02-normas/leccion.pdf')">
       <div style="font-size:40px">📋</div>
       <div>Normas Circulación</div>
       <div style="font-size:11px;color:#999">Edición 2024</div>
     </div>
-    <div class="temario-item" onclick="abrirPDF('./03_Manual_IX_Primeros_Auxilios_2025.pdf')">
-      <div style="font-size:40px">🚑</div>
-      <div>Primeros Auxilios</div>
-      <div style="font-size:11px;color:#999">Manual IX 2025</div>
-    </div>
-    <div class="temario-item" onclick="abrirPDF('./04_Manual_VIII_Mecanica_2024.pdf')">
+    <div class="temario-item" onclick="abrirPDF('/content/temario/03-mecanica/leccion.pdf')">
       <div style="font-size:40px">⚙️</div>
       <div>Mecánica</div>
       <div style="font-size:11px;color:#999">Manual VIII 2025</div>
     </div>
-    <div class="temario-item" onclick="abrirPDF('./05_Medio_Ambiente_Distintivos_DGT_2025.pdf')">
+    <div class="temario-item" onclick="abrirPDF('/content/temario/04-primeros-auxilios/leccion.pdf')">
+      <div style="font-size:40px">🚑</div>
+      <div>Primeros Auxilios</div>
+      <div style="font-size:11px;color:#999">Manual IX 2025</div>
+    </div>
+    <div class="temario-item" onclick="abrirPDF('/content/temario/05-medio-ambiente/leccion.pdf')">
       <div style="font-size:40px">♻️</div>
       <div>Medio Ambiente</div>
       <div style="font-size:11px;color:#999">Distintivos DGT 2025</div>
@@ -880,7 +895,7 @@ function actualizarMensajeMotivacional() {
 if('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('./service-worker.js')
-    .then(reg => console.log('SW registrado'))
-    .catch(err => console.log('SW error:', err));
+   .then(reg => console.log('SW registrado'))
+   .catch(err => console.log('SW error:', err));
   });
 }
