@@ -41,7 +41,7 @@ let estado = {
     normas: {idx:0,aciertos:0,racha:0,puntuacion:0},
     mecanica: {idx:0,aciertos:0,racha:0,puntuacion:0},
     auxilios: {idx:0,aciertos:0,racha:0,puntuacion:0},
-    medioambiente: {idx:0,aciertos:0,racha:0,puntuacion:0}  // <-- CORREGIDO: tenía "mediambiente"
+    medioambiente: {idx:0,aciertos:0,racha:0,puntuacion:0}
   },
   examen: {
     activa: false,
@@ -51,7 +51,7 @@ let estado = {
     fallos: 0,
     timer: null,
     tiempo: 1800,
-    categoria: 'senales' // antes era 'general'
+    categoria: 'senales'
   },
   sit: {
     clima: {idx:0,aciertos:0,puntuacion:0,current:null},
@@ -60,19 +60,20 @@ let estado = {
     emergencia: {idx:0,aciertos:0,puntuacion:0,current:null}
   }
 };
+
 // Helper para leer datos desde window sin romper si falta archivo
 function getPreguntas(cat) {
-  const key = 'PREGUNTAS_' + cat.toUpperCase();
+  const key = 'preguntas_' + cat;
   return window[key] || [];
 }
 
 function getSituaciones(cat) {
-  const key = 'SITUACIONES_' + cat.toUpperCase();
-  return window[key] || [];
+  const key = 'preguntas_situaciones';
+  return window[key] && window[key][cat]? window[key][cat] : [];
 }
 
 function getSVG(id) {
-  return window.SENALES_SVG && window.SENALES_SVG[id]? window.SENALES_SVG[id] : '';
+  return window.senales_svg && window.senales_svg[id]? window.senales_svg[id] : '';
 }
 
 // Init se ejecuta cuando index.html carga apps.js
@@ -130,7 +131,7 @@ function cambiarTab(e, tab) {
   if(tab === 'tienda') cargarTienda();
   if(tab === 'tips') cargarTips();
   if(tab === 'temario') cargarTemario();
-  if(tab === 'test') cargarPregunta('senales'); // Default a senales, no general
+  if(tab === 'test') cargarPregunta('senales');
   if(tab === 'situaciones') cargarSituacion(sitCategoriaActiva);
 }
 
@@ -143,7 +144,7 @@ function cambiarSubTab(e, tab, subtab) {
   document.getElementById(`${tab === 'test'? 'test' : 'sit'}-${subtab}`).classList.add('active');
   if(tab === 'test') cargarPregunta(subtab);
   if(tab === 'sit') cargarSituacion(subtab);
-  }
+}
 
 // 100 TIPS DEL DÍA - DOPAMINA DIARIA
 const TIPS = [
