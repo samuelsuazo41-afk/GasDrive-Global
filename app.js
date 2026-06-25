@@ -327,6 +327,15 @@ const ACCESORIOS = [
 
 // === BLOQUE 2: FUNCIONES UI + LÓGICA TEST/SIT/EXAMEN ===
 
+// Esperar a que los datos estén cargados
+function datosListos() {
+  return window.preguntas_senales &&
+         window.preguntas_normas &&
+         window.preguntas_mecanica &&
+         window.preguntas_auxilios &&
+         window.preguntas_medioambiente;
+}
+
 // Subtabs globales - CRÍTICO para que no dé ReferenceError
 window.cambiarSubTab = function(tab) {
   document.querySelectorAll('.subtab-btn').forEach(btn => btn.classList.remove('active'));
@@ -371,7 +380,13 @@ window.mostrarEmoji = function(acierto, element) {
 window.cargarPregunta = function(cat) {
   const s = window.estado.test[cat];
   const preguntas = window.barajarArray(window.getPreguntas(cat));
-  if(!preguntas || preguntas.length === 0) return;
+
+  // FIX: Si no hay preguntas, esperar 100ms y reintentar
+  if(!preguntas || preguntas.length === 0) {
+    console.log('Esperando datos para', cat);
+    setTimeout(() => window.cargarPregunta(cat), 100);
+    return;
+  }
 
   const pOriginal = preguntas[s.idx % preguntas.length];
   const opcionesBarajadas = window.barajarArray(pOriginal.a);
@@ -380,7 +395,14 @@ window.cargarPregunta = function(cat) {
   const p = {...pOriginal, a: opcionesBarajadas, ok: nuevoIndexCorrecto};
   s.current = p;
 
-  document.getElementById(`test-${cat}-pregunta`).textContent = p.q;
+  // FIX: Check que el elemento existe antes de usarlo
+  const preguntaEl = document.getElementById(`test-${cat}-pregunta`);
+  if(!preguntaEl) {
+    console.error('No existe test-${cat}-pregunta');
+    return;
+  }
+
+  preguntaEl.textContent = p.q;
   document.getElementById(`test-${cat}-aciertos`).textContent = s.aciertos;
   document.getElementById(`test-${cat}-racha`).textContent = s.racha;
   document.getElementById(`test-${cat}-score`).textContent = s.puntuacion;
@@ -399,6 +421,11 @@ window.cargarPregunta = function(cat) {
   }
 
   const cont = document.getElementById(`test-${cat}-opciones`);
+  if(!cont) {
+    console.error('No existe test-${cat}-opciones');
+    return;
+  }
+
   cont.innerHTML = '';
   document.getElementById(`test-${cat}-feedback`).textContent = '';
   document.getElementById(`btn-sig-test-${cat}`).disabled = true;
@@ -410,6 +437,12 @@ window.cargarPregunta = function(cat) {
     div.onclick = function() { window.responderTest(cat, i, this); };
     cont.appendChild(div);
   });
+
+  // Quitar "Cargando datos..." cuando cargue la primera pregunta
+  const motEl = document.getElementById('motivacion');
+  if(motEl && motEl.textContent === 'Cargando datos...') {
+    window.actualizarMensajeMotivacional();
+  }
 }
 
 window.responderTest = function(cat, idx, el) {
@@ -452,7 +485,10 @@ window.cargarSituacion = function(cat) {
   if(!cat) cat = window.sitCategoriaActiva;
   const s = window.estado.sit[cat];
   const casos = window.barajarArray(window.getSituaciones(cat));
-  if(!casos || casos.length === 0) return;
+  if(!casos || casos.length === 0) {
+    setTimeout(() => window.cargarSituacion(cat), 100);
+    return;
+  }
 
   const pOriginal = casos[s.idx % casos.length];
   const opcionesBarajadas = window.barajarArray(pOriginal.a);
@@ -467,6 +503,8 @@ window.cargarSituacion = function(cat) {
   document.getElementById(`sit-${cat}-progress`).style.width = `${((s.idx % casos.length)/casos.length)*100}%`;
 
   const cont = document.getElementById(`sit-${cat}-opciones`);
+  if(!cont) return;
+
   cont.innerHTML = '';
   document.getElementById(`sit-${cat}-feedback`).textContent = '';
   document.getElementById(`btn-sig-sit-${cat}`).disabled = true;
@@ -516,12 +554,12 @@ window.siguienteSituacion = function(e, cat) {
 // EXAMEN - todas las categorías
 window.iniciarExamen = function(e) {
   const todas = [
-  ...window.getPreguntas('senales'),
-  ...window.getPreguntas('normas'),
-  ...window.getPreguntas('mecanica'),
-  ...window.getPreguntas('auxilios'),
-  ...window.getPreguntas('medioambiente'),
-  ...window.getSituaciones('clima')
+ ...window.getPreguntas('senales'),
+ ...window.getPreguntas('normas'),
+ ...window.getPreguntas('mecanica'),
+ ...window.getPreguntas('auxilios'),
+ ...window.getPreguntas('medioambiente'),
+ ...window.getSituaciones('clima')
   ];
 
   if(todas.length < 30) {
@@ -687,9 +725,9 @@ window.cargarGaraje = function() {
     div.className = 'garage-car' + (desbloqueado? '' : ' locked');
     div.innerHTML = `
       <div style="font-size:40px; filter:${coche.color}">${coche.emoji}</div>
-      <div>${coche.nom}</div>
+      <div>${coche.nombre}</div>
       <div style="color:#667eea">${coche.cv} CV</div>
-      ${!desbloqueado? `<button class="btn-buy" onclick="window.comprarCoche('${coche.id}')">Comprar ${coche.preu}💰</button>` : '<div style="color:#2ecc71">✓ Propietario</div>'}
+      ${!desbloqueado? `<button class="btn-buy" onclick="window.comprarCoche('${coche.id}')">Comprar ${coche.precio}💰</button>` : '<div style="color:#2ecc71">✓ Propietario</div>'}
     `;
     cont.appendChild(div);
   });
@@ -698,11 +736,11 @@ window.cargarGaraje = function() {
 window.comprarCoche = function(id) {
   const coche = (window.COCHES || []).find(c => c.id === id);
   if(!coche) return;
-  if(window.estado.coins < coche.preu) {
+  if(window.estado.coins < coche.precio) {
     alert('No tienes suficientes coins');
     return;
   }
-  window.estado.coins -= coche.preu;
+  window.estado.coins -= coche.precio;
   window.estado.coches.push(id);
   window.guardar();
   window.actualizarCoins();
@@ -719,9 +757,9 @@ window.cargarTienda = function() {
     div.className = 'emoji-item' + (comprado? ' locked' : '');
     div.innerHTML = `
       <div style="font-size:40px">${acc.emoji}</div>
-      <div>${acc.nom}</div>
+      <div>${acc.nombre}</div>
       <div style="color:#667eea">+${acc.hp} CV</div>
-      ${!comprado? `<button class="btn-buy" onclick="window.comprarAccesorios('${acc.id}')">Comprar ${acc.preu}💰</button>` : '<div style="color:#2ecc71">✓ Comprado</div>'}
+      ${!comprado? `<button class="btn-buy" onclick="window.comprarAccesorios('${acc.id}')">Comprar ${acc.precio}💰</button>` : '<div style="color:#2ecc71">✓ Comprado</div>'}
     `;
     cont.appendChild(div);
   });
@@ -732,9 +770,9 @@ window.cargarTienda = function() {
     div.className = 'emoji-item' + (comprado? ' locked' : '');
     div.innerHTML = `
       <div style="font-size:40px">${emoji.emoji}</div>
-      <div>${emoji.nom}</div>
+      <div>${emoji.nombre}</div>
       <div style="color:#667eea">Cosmético</div>
-      ${!comprado? `<button class="btn-buy" onclick="window.comprarEmoji('${emoji.id}')">Comprar ${emoji.preu}💰</button>` : '<div style="color:#2ecc71">✓ Comprado</div>'}
+      ${!comprado? `<button class="btn-buy" onclick="window.comprarEmoji('${emoji.id}')">Comprar ${emoji.precio}💰</button>` : '<div style="color:#2ecc71">✓ Comprado</div>'}
     `;
     cont.appendChild(div);
   });
@@ -743,11 +781,11 @@ window.cargarTienda = function() {
 window.comprarAccesorios = function(id) {
   const acc = (window.ACCESORIOS || []).find(a => a.id === id);
   if(!acc) return;
-  if(window.estado.coins < acc.preu) {
+  if(window.estado.coins < acc.precio) {
     alert('No tienes suficientes coins');
     return;
   }
-  window.estado.coins -= acc.preu;
+  window.estado.coins -= acc.precio;
   window.estado.accesorios.push(id);
   window.guardar();
   window.actualizarCoins();
@@ -764,11 +802,11 @@ window.comprarAccesorios = function(id) {
 window.comprarEmoji = function(id) {
   const emoji = (window.EMOJI_TIENDA || []).find(e => e.id === id);
   if(!emoji) return;
-  if(window.estado.coins < emoji.preu) {
+  if(window.estado.coins < emoji.precio) {
     alert('No tienes suficientes coins');
     return;
   }
-  window.estado.coins -= emoji.preu;
+  window.estado.coins -= emoji.precio;
   window.estado.emojis.push(id);
   window.guardar();
   window.actualizarCoins();
