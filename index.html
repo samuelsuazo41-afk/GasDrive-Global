@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GasDrive DGT ES V8.5</title>
+<title>GasDrive DGT ES V9.0</title>
 <link rel="manifest" href="./manifest.json">
 <style>
 html, body { background: #0a0a0a; color: #fff; margin: 0; padding: 0; font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; }
@@ -15,7 +15,7 @@ h1{font-size:24px;font-weight:900;letter-spacing:1.5px;margin-bottom:3px}
 .tabs{position:fixed;bottom:0;left:0;right:0;background:#111;border-top:1px solid #222;display:flex;z-index:100;overflow-x:auto}
 .tab-btn{flex:1;min-width:70px;padding:11px 4px;background:none;border:none;color:#666;font-size:10px;cursor:pointer;transition:0.2s}
 .tab-btn.active{color:#00D9FF;background:#1a1a1a}
-.tab-btn.emoji{font-size:19px;display:block;margin-bottom:3px}
+.tab-btn .emoji{font-size:19px;display:block;margin-bottom:3px}
 .tab-content{display:none;padding:12px;animation:fadeIn 0.3s;padding-bottom:80px;min-height:calc(100vh - 140px)}
 .tab-content.active{display:block}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
@@ -68,7 +68,7 @@ h1{font-size:24px;font-weight:900;letter-spacing:1.5px;margin-bottom:3px}
   display: none;
 }
 #test-senales-imagen:not(:empty) { display: block; }
-#test-senales-imagen svg { max-width: 100%; max-height: 190px; display: block; margin: 0 auto; }
+#test-senales-imagen svg, #test-senales-imagen img { max-width: 100%; max-height: 190px; display: block; margin: 0 auto; }
 </style>
 </head>
 <body>
@@ -103,7 +103,7 @@ h1{font-size:24px;font-weight:900;letter-spacing:1.5px;margin-bottom:3px}
   <div id="test-normas" class="sub-content">
     <div class="card">
       <h2>📋 NORMAS Y VELOCIDADES</h2>
-      <div class="stats"><div>Aciertos: <span id="test-normas-aciertos">0</span>/5</div><div>Racha: <span id="test-normas-racha">0</span>🔥</div><div>Score: <span id="test-normas-score">0</span></div>
+      <div class="stats"><div>Aciertos: <span id="test-normas-aciertos">0</span>/5</div><div>Racha: <span id="test-normas-racha">0</span>🔥</div><div>Score: <span id="test-normas-score">0</span></div></div>
       <div class="progress-bar"><div class="progress-fill" id="test-normas-progress"></div></div>
       <div id="test-normas-imagen" style="display:none"></div>
       <div class="pregunta" id="test-normas-pregunta"></div>
@@ -172,7 +172,7 @@ h1{font-size:24px;font-weight:900;letter-spacing:1.5px;margin-bottom:3px}
 
 <div id="tab-tienda" class="tab-content"><div class="card"><h2>🛒 TIENDA</h2><p style="margin-bottom:12px;font-size:13px;color:#999">Cambia tus puntos por coches y accesorios</p><div class="emoji-shop" id="emoji-tienda"></div></div></div>
 
-<div id="tab-tips" class="tab-content"><div class="card"><h2>💡 CONSEJO DGT</h2><div id="tip-content"></div><div style="display:flex;gap:10px;margin-top:15px"><button class="btn" style="flex:1" onclick="prevTip(event)">ANTERIOR</button><span id="tip-counter" style="align-self:center">1/5</span><button class="btn" style="flex:1" onclick="nextTip(event)">SIGUIENTE</button></div></div>
+<div id="tab-tips" class="tab-content"><div class="card"><h2>💡 CONSEJO DGT</h2><div id="tip-content"></div><div style="display:flex;gap:10px;margin-top:15px"><button class="btn" style="flex:1" onclick="prevTip(event)">ANTERIOR</button><span id="tip-counter" style="align-self:center">1/5</span><button class="btn" style="flex:1" onclick="nextTip(event)">SIGUIENTE</button></div></div></div>
 
 <div id="tab-temario" class="tab-content"><div class="card"><h2>📖 TEMARIOS OFICIALES</h2><p style="margin-bottom:12px;font-size:13px;color:#999">Estudia los temarios completos DGT</p><div id="temario-lista"></div></div></div>
 
@@ -186,15 +186,8 @@ h1{font-size:24px;font-weight:900;letter-spacing:1.5px;margin-bottom:3px}
   <button class="tab-btn" onclick="cambiarTab(event,'temario')"><span class="emoji">📖</span>TEMARIO</button>
 </div>
 
-<!-- IMPORTANTE: Sin defer para cargar en orden -->
-<script src="./data/preguntas_senales.js"></script>
-<script src="./data/preguntas_normas.js"></script>
-<script src="./data/preguntas_mecanica.js"></script>
-<script src="./data/preguntas_auxilios.js"></script>
-<script src="./data/preguntas_medioambiente.js"></script>
-<script src="./data/preguntas_situaciones.js"></script>
-<script src="./data/senales_svg.js"></script>
-<script src="./apps.js?v=8.8.8"></script>
+<!-- CAMBIO CLAVE: Solo carga app.js como módulo. Borra todos los data/*.js -->
+<script type="module" src="./src/app.js"></script>
 
 <script>
 if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js');
