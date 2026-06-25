@@ -145,58 +145,6 @@ function cambiarSubTab(e, tab, subtab) {
   if(tab === 'sit') cargarSituacion(subtab);
   }
 
-// ============================================
-// INIT
-// ============================================
-function init() {
-  console.log(`🚀 GasDrive V${VERSION} iniciado`);
-  const t0 = performance.now();
-
-  try {
-    actualizarCoins();
-    actualizarMensajeMotivacional();
-    window.categoriaActual = 'general'; // FIX: Asegurar valor inicial
-
-    const PREGUNTAS_GENERAL = mezclarSinDuplicar(
-  window.preguntas_senales || [],
-  window.preguntas_normas || [],
-  window.preguntas_mecanica || [],
-  window.preguntas_auxilios || [],
-  window.preguntas_medioambiente || []
-);
-    window.PREGUNTAS_GENERAL = PREGUNTAS_GENERAL;
-
-    console.log(`DEBUG: General cargó ${PREGUNTAS_GENERAL.length} preguntas`);
-
-    DATOS_CARGADOS = true;
-
-    // Precarga solo si bloque 2 existe
-    if(typeof cargarPregunta === 'function') {
-      cargarPregunta('general');
-      cargarPregunta('senales');
-      cargarPregunta('normas');
-      cargarPregunta('mecanica');
-      cargarPregunta('auxilios');
-      cargarPregunta('medioambiente');
-    }
-    if(typeof cargarSituacion === 'function') {
-      cargarSituacion('clima');
-    }
-
-    const tiempoCarga = Math.round(performance.now() - t0);
-    console.log(`✅ Datos cargados en ${tiempoCarga}ms. General: ${PREGUNTAS_GENERAL.length} preguntas`);
-    actualizarUIProgreso();
-  } catch(e) {
-    console.error('❌ Error cargando datos:', e);
-  }
-
-  if(document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => setTimeout(mostrarIntro, 50));
-  } else {
-    setTimeout(mostrarIntro, 50);
-  }
-}
-
 // 100 TIPS DEL DÍA - DOPAMINA DIARIA
 const TIPS = [
   {emoji:'🚗', txt:'Regla de los 2 segundos: mantén distancia con el coche de delante'},
