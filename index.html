@@ -8,6 +8,13 @@
 <link rel="manifest" href="./manifest.json">
 <style>
 html, body { background: #0a0a0a; color: #fff; margin: 0; padding: 0; font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; }
+/* Splash Screen */
+#splash{position:fixed;inset:0;background:linear-gradient(180deg,#1a1a2e 0%,#0a0a0a 100%);z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center}
+#splash h1{font-size:32px;font-weight:900;margin:20px 0 10px}
+#splash p{font-size:14px;opacity:0.9;margin:6px 0;max-width:300px}
+#splash .btn-empezar{background:linear-gradient(135deg,#FF6B00,#FF0055);color:#fff;border:none;padding:16px 40px;border-radius:12px;font-size:18px;font-weight:900;margin-top:30px;cursor:pointer;box-shadow:0 4px 20px rgba(255,0,85,0.4)}
+#splash .btn-empezar:active{transform:scale(0.96)}
+#app{display:none}
 .header{background:linear-gradient(180deg,#2a2a2a 0%,#0a0a0a 100%);padding:14px 20px 18px;text-align:center;border-bottom:1px solid #333;position:sticky;top:0;z-index:50}
 h1{font-size:24px;font-weight:900;letter-spacing:1.5px;margin-bottom:3px}
 .subtitle{font-size:11px;opacity:0.9;margin-top:2px;display:flex;align-items:center;justify-content:center;gap:6px}
@@ -74,6 +81,21 @@ h1{font-size:24px;font-weight:900;letter-spacing:1.5px;margin-bottom:3px}
 </style>
 </head>
 <body>
+<!-- SPLASH SCREEN -->
+<div id="splash">
+  <div style="font-size:80px">🚗</div>
+  <h1>GasDrive DGT ES<br>2026</h1>
+  <p>Aprueba el carnet en 15 min al día</p>
+  <p>📚 Temarios oficiales DGT para estudiar cuando quieras</p>
+  <p>💰 Gana coins respondiendo bien</p>
+  <p>🏎️ Compra supercars en el Garaje</p>
+  <p>📚 630 preguntas DGT reales</p>
+  <p>📖 Temarios completos para repasar</p>
+  <button class="btn-empezar" onclick="empezarApp()">EMPEZAR</button>
+</div>
+
+<!-- APP PRINCIPAL -->
+<div id="app">
 <div class="header">
   <h1>🚘 GasDrive DGT ES</h1>
   <div class="subtitle">630+ Preguntas DGT RD 465/2025<span class="coins" id="coins">💰 0</span></div>
@@ -183,8 +205,33 @@ h1{font-size:24px;font-weight:900;letter-spacing:1.5px;margin-bottom:3px}
   <button class="tab-btn" onclick="cambiarTab(event,'tips')"><span class="emoji">💡</span>TIPS</button>
   <button class="tab-btn" onclick="cambiarTab(event,'temario')"><span class="emoji">📖</span>TEMARIO</button>
 </div>
+</div>
 
 <script src="./data/senales_svg.js"></script>
-<script type="module" src="./app.js"></script>
+<script type="module">
+// Importa tu app.js y expón funciones globales para onclick
+import * as App from './app.js';
+
+// Función del botón EMPEZAR
+window.empezarApp = () => {
+  document.getElementById('splash').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  App.init();
+};
+
+// Exponer todas las funciones que usa el HTML
+window.cambiarTab = App.cambiarTab;
+window.cambiarSubTab = App.cambiarSubTab;
+window.siguienteTest = App.siguienteTest;
+window.siguienteSituacion = App.siguienteSituacion;
+window.iniciarExamen = App.iniciarExamen;
+window.siguientePreguntaExamen = App.siguientePreguntaExamen;
+window.prevTip = App.prevTip;
+window.nextTip = App.nextTip;
+window.comprarEmoji = App.comprarEmoji;
+window.equiparEmoji = App.equiparEmoji;
+window.abrirPDF = App.abrirPDF;
+window.cerrarPDF = App.cerrarPDF;
+</script>
 </body>
-</html> 
+</html>
