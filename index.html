@@ -209,17 +209,15 @@ h1{font-size:24px;font-weight:900;letter-spacing:1.5px;margin-bottom:3px}
 
 <script src="./data/senales_svg.js"></script>
 <script type="module">
-// Importa tu app.js y expón funciones globales para onclick
+// IMPORTANTE: Importamos y exponemos al window para que onclick funcione
 import * as App from './app.js';
 
-// Función del botón EMPEZAR
-window.empezarApp = () => {
-  document.getElementById('splash').style.display = 'none';
-  document.getElementById('app').style.display = 'block';
+// Exponer funciones globales que usa el HTML
+window.cerrarIntro = () => {
+  document.getElementById('intro-screen')?.remove();
   App.init();
 };
 
-// Exponer todas las funciones que usa el HTML
 window.cambiarTab = App.cambiarTab;
 window.cambiarSubTab = App.cambiarSubTab;
 window.siguienteTest = App.siguienteTest;
@@ -232,6 +230,14 @@ window.comprarEmoji = App.comprarEmoji;
 window.equiparEmoji = App.equiparEmoji;
 window.abrirPDF = App.abrirPDF;
 window.cerrarPDF = App.cerrarPDF;
+window.comprarCoche = App.comprarCoche;
+window.comprarAccesorios = App.comprarAccesorios;
+
+// Arranca la intro al cargar
+document.addEventListener('DOMContentLoaded', () => {
+  if (typeof mostrarIntro === 'function') mostrarIntro();
+  else App.init(); // Fallback si no tienes intro
+});
 </script>
 </body>
 </html>
