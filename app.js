@@ -1,42 +1,43 @@
-// GASDRIVE DGT V9.6.0 ES - VERSIÓN ESTABLE SIN BUCLES
+// GASDRIVE DGT V9.6.1 ES - ARQUITECTURA CHRONICLES CAT
 const EMOJIS_ACIERTO = ['🚀','💎','👑','🔥','💯','⚡','🏆','🦄','🤑','✅','💪','😎','🎯','💥','🌟','🎉'];
 const EMOJIS_FALLO = ['❌','💀','😭','⛔','💔','😵','🤦','🚫','💩','🤡','💥','😤'];
 
 const cachePreguntas = {};
 let DATOS_LISTOS = false;
 
-// ===== SISTEMA DE CARGA NUEVO - REEMPLAZA MOSTRAR INTRO =====
+// ===== SISTEMA DE CARGA NUEVO - ESTILO CHRONICLES =====
 async function iniciarCarga() {
   const btn = document.getElementById('btn-empezar');
   const status = document.getElementById('intro-status');
-  const inicio = Date.now();
+  let cargadas = 0;
+  const cats = ['senales', 'normas', 'mecanica', 'auxilios', 'medioambiente'];
 
-  try {
-    const cats = ['senales', 'normas', 'mecanica', 'auxilios', 'medioambiente'];
-    const resultados = await Promise.allSettled(cats.map(cat => getPreguntas(cat)));
+  status.textContent = '📚 0/5 categorías';
 
-    const fallidos = resultados.filter(r => r.status === 'rejected').length;
-    const tiempoMinimo = 2000 - (Date.now() - inicio);
-
-    if (tiempoMinimo > 0) await new Promise(r => setTimeout(r, tiempoMinimo));
-
-    if (fallidos === 5) {
-      status.textContent = '❌ Error cargando datos. Revisa tu conexión';
-      btn.textContent = 'REINTENTAR';
-      btn.disabled = false;
-      btn.onclick = () => location.reload();
-    } else {
-      DATOS_LISTOS = true;
-      status.textContent = fallidos > 0? `⚠️ ${5-fallidos}/5 categorías cargadas` : '✅ Datos listos';
-      btn.textContent = 'EMPEZAR';
-      btn.disabled = false;
-      btn.onclick = entrarApp;
+  // CARGA 1 A 1 CON FEEDBACK REAL - NO Promise.all
+  for (const cat of cats) {
+    try {
+      await getPreguntas(cat);
+      cargadas++;
+      status.textContent = `📚 ${cargadas}/5 categorías`;
+    } catch (err) {
+      console.warn(`${cat} falló:`, err);
+      // Si falla, sigue con las demás. No revienta todo.
     }
-  } catch (err) {
-    status.textContent = '❌ Error crítico';
+  }
+
+  // SIN setTimeout(2000) - Entra cuando acaba de cargar
+  if (cargadas === 0) {
+    status.textContent = '❌ Error cargando datos. Revisa tu conexión';
     btn.textContent = 'REINTENTAR';
     btn.disabled = false;
     btn.onclick = () => location.reload();
+  } else {
+    DATOS_LISTOS = true;
+    status.textContent = cargadas === 5? '✅ Todo listo' : `⚠️ ${cargadas}/5 listas - Entra igual`;
+    btn.textContent = 'EMPEZAR';
+    btn.disabled = false;
+    btn.onclick = entrarApp;
   }
 }
 
@@ -255,14 +256,23 @@ const EMOJI_TIENDA = [
 // ===== HELPERS =====
 function getPreguntas(cat) {
   if (cachePreguntas[cat]) return Promise.resolve(cachePreguntas[cat]);
-  return fetch(`./content/preguntas/${cat}.json`)
-   .then(r => {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 3000);
+  return fetch(`./data/${cat}.json`, { signal: controller.signal })
+.then(r => {
+      clearTimeout(timeout);
       if (!r.ok) throw new Error(`No se encontró ${cat}.json`);
       return r.json();
     })
-   .then(data => {
+.then(data => {
       cachePreguntas[cat] = data;
       return data;
+    })
+.catch(err => {
+      clearTimeout(timeout);
+      console.error(`Error ${cat}:`, err);
+      cachePreguntas[cat] = [];
+      return [];
     });
 }
 
@@ -270,7 +280,7 @@ async function getSituaciones(cat) {
   const key = `sit_${cat}`;
   if (cachePreguntas[key]) return cachePreguntas[key];
   try {
-    const res = await fetch(`./content/preguntas/situaciones.json`);
+    const res = await fetch(`./data/situaciones.json`);
     const data = await res.json();
     const filtrado = data.filter(s => s.categoria === cat);
     cachePreguntas[key] = filtrado;
@@ -285,7 +295,7 @@ function getSVG(id) {
   if (typeof SENALES_SVG!== 'undefined' && SENALES_SVG[id]) {
     return SENALES_SVG[id];
   }
-  return `<img src="./content/imagenes/svg/${id}.svg" style="max-width:100%;height:auto">`;
+  return `<img src="./data/svg/${id}.svg" style="max-width:100%;height:auto">`;
 }
 
 function barajarArray(arr) {
@@ -299,7 +309,7 @@ function barajarArray(arr) {
 
 // ===== INIT =====
 function init() {
-  console.log("GasDrive V9.6.0 ES cargado");
+  console.log("GasDrive V9.6.1 ES cargado");
   actualizarCoins();
   cargarPregunta('senales');
   cargarPregunta('normas');
@@ -308,12 +318,6 @@ function init() {
   cargarPregunta('medioambiente');
   cargarSituacion('clima');
   actualizarMensajeMotivacional();
-
-  if('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js')
-     .then(reg => console.log('SW registrado'))
-     .catch(err => console.log('SW error:', err));
-  }
 }
 
 function guardar() {
@@ -341,7 +345,7 @@ function mostrarEmoji(acierto, element) {
 }
 
 // ===== TABS =====
-function cambiarTab(e, tab) {
+function cambiarTab(tab, e) {
   document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('tab-' + tab).classList.add('active');
@@ -572,11 +576,11 @@ function siguienteSituacion(e, cat) {
 // ===== EXAMEN OFICIAL =====
 async function iniciarExamen(e) {
   const todas = [
-   ...await getPreguntas('senales'),
-   ...await getPreguntas('normas'),
-   ...await getPreguntas('mecanica'),
-   ...await getPreguntas('auxilios'),
-   ...await getPreguntas('medioambiente')
+...await getPreguntas('senales'),
+...await getPreguntas('normas'),
+...await getPreguntas('mecanica'),
+...await getPreguntas('auxilios'),
+...await getPreguntas('medioambiente')
   ];
 
   if(todas.length < 30) {
@@ -944,7 +948,6 @@ export {
   prevTip,
   nextTip,
   comprarEmoji,
-  equiparEmoji,
   abrirPDF,
   cerrarPDF,
   comprarCoche,
