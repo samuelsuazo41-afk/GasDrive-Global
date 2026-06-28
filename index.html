@@ -16,13 +16,12 @@
 :root{--bg:#0a0a0a;--card:#1a1a1a;--accent:#00D9FF;--accent2:#ff2d55;--text:#fff;--text-sec:#999}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;overflow-x:hidden}
+#intro-screen{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--bg);z-index:9999}
+#app{display:none}
 header{background:linear-gradient(180deg,#2a2a2a 0%,#0a0a0a 100%);padding:14px 20px 18px;text-align:center;border-bottom:1px solid #333;position:sticky;top:0;z-index:50}
 h1{font-size:24px;font-weight:900;letter-spacing:1.5px;margin-bottom:3px}
-.subtitle{font-size:11px;opacity:0.9;margin-top:2px;display:flex;align-items:center;justify-content:center;gap:6px}
-.coins{display:inline-flex;align-items:center;background:#FFD700;color:#000;padding:2px 9px;border-radius:14px;font-weight:900;font-size:11px}
 #motivacion{margin-top:6px;font-size:12px;color:#FFD700;font-weight:600}
 .stats-bar{display:flex;justify-content:space-between;padding:10px 20px;background:#111;border-bottom:1px solid #222;font-size:12px}
-.stat-item{display:flex;align-items:center;gap:6px}
 .container{padding:12px;min-height:calc(100vh - 180px);padding-bottom:80px}
 .tab-content{display:none;animation:fadeIn 0.3s}
 .tab-content.active{display:block}
@@ -42,46 +41,58 @@ h1{font-size:24px;font-weight:900;letter-spacing:1.5px;margin-bottom:3px}
 .opcio.bloquejada{pointer-events:none}
 @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
 @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-10px)}75%{transform:translateX(10px)}}
+@keyframes bounceIn{0%{transform:translateY(-50%) scale(0)}50%{transform:translateY(-50%) scale(1.2)}100%{transform:translateY(-50%) scale(1)}}
+@keyframes slideUp{from{transform:translateX(-50%) translateY(100px);opacity:0}to{transform:translateX(-50%) translateY(0);opacity:1}}
 .btn-sig{background:linear-gradient(180deg,#4a4a4a 0%,#2a2a2a 100%);color:#fff;border:none;padding:14px;width:100%;font-size:15px;font-weight:700;margin-top:10px;border-radius:10px;cursor:pointer}
 .btn-sig:disabled{background:#333;color:#666;cursor:not-allowed}
-.btn-pista{background:#333;color:var(--accent);border:1px solid var(--accent);padding:10px;width:100%;font-size:13px;font-weight:700;margin-top:6px;border-radius:10px;cursor:pointer}
 .stats{display:flex;justify-content:space-between;background:#0f0f0f;padding:9px;border-radius:7px;margin-bottom:10px;font-size:12px}
 .stats span{color:var(--accent);font-weight:700}
 .feedback{text-align:center;font-size:18px;font-weight:900;margin:12px 0;padding:10px;border-radius:9px}
 .feedback.acierto{background:#0a4;color:#fff}
 .feedback.fallo{background:#a00;color:#fff}
-.pista{font-size:13px;color:#FFD700;background:#1a1a0a;border:1px solid #FFD700;padding:10px;border-radius:8px;margin:10px 0;display:none}
-.pista.activa{display:block}
 .progress-bar{background:#222;height:7px;border-radius:3px;margin:7px 0;overflow:hidden}
 .progress-fill{background:linear-gradient(90deg,var(--accent),#0f5);height:100%;transition:width 0.3s}
-#test-senales-imagen, #examen-imagen{text-align:center;margin:22px auto 16px auto;padding:18px;min-height:220px;max-width:270px;background:#0d0d0d;border:2px solid #2f2f2f;border-radius:18px;display:none}
-#test-senales-imagen:not(:empty), #examen-imagen:not(:empty){display:block}
-#test-senales-imagen svg, #test-senales-imagen img{max-width:100%;max-height:190px;display:block;margin:0 auto}
-#test-senales-imagen.placeholder, #examen-imagen.placeholder{display:flex!important;align-items:center;justify-content:center;color:#555;font-size:48px}
+#test-senales-imagen,#test-normas-imagen,#test-mecanica-imagen,#test-auxilios-imagen,#test-medioambiente-imagen,#examen-imagen{text-align:center;margin:22px auto 16px auto;padding:18px;min-height:220px;max-width:270px;background:#0d0d0d;border:2px solid #2f2f2f;border-radius:18px;display:none}
+#test-senales-imagen:not(:empty),#test-normas-imagen:not(:empty),#test-mecanica-imagen:not(:empty),#test-auxilios-imagen:not(:empty),#test-medioambiente-imagen:not(:empty),#examen-imagen:not(:empty){display:block}
+#test-senales-imagen svg,#test-senales-imagen img,#examen-imagen svg,#examen-imagen img{max-width:100%;max-height:190px;display:block;margin:0 auto}
+.placeholder{display:flex!important;align-items:center;justify-content:center;color:#555;font-size:48px}
 #test-senales-imagen.placeholder::before{content:"🚦";opacity:0.3}
 #examen-imagen.placeholder::before{content:"📋";opacity:0.3}
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;background:#111;border-top:1px solid #222;display:flex;z-index:100}
 .nav-item{flex:1;padding:11px 4px;text-align:center;cursor:pointer;transition:0.2s;color:#666;font-size:10px}
 .nav-item.active{color:var(--accent);background:#1a1a1a}
 .nav-icon{font-size:19px;display:block;margin-bottom:3px}
-#modal,#tutorialModal{position:fixed;inset:0;background:rgba(0,0,0,0.9);display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px}
-#modal.hidden,#tutorialModal.hidden{display:none}
-.modal-content{background:var(--card);border:2px solid var(--accent);border-radius:16px;padding:24px;max-width:400px;text-align:center}
-.modal-botons{display:flex;gap:10px;margin-top:20px}
-.modal-botons button{flex:1;padding:12px;border:none;border-radius:8px;font-weight:700;cursor:pointer}
-.btn{background:var(--accent);color:#000}
-.btn-sec{background:#333;color:#fff}
 .lista-temas{display:flex;flex-direction:column;gap:8px}
 .tema-item{background:#222;border:1px solid #333;padding:14px;border-radius:10px;cursor:pointer}
 .tema-item:hover{border-color:var(--accent)}
+.tema-item.locked{opacity:0.4}
 .grid-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .card-mini{background:#222;border:1px solid #333;padding:12px;border-radius:10px;text-align:center;font-size:13px}
 .locked{opacity:0.4}
 .btn-buy{background:var(--accent);color:#000;border:none;padding:6px 10px;border-radius:6px;font-size:11px;font-weight:700;margin-top:6px;cursor:pointer;width:100%}
+.btn{background:var(--accent);color:#000;border:none;padding:12px 24px;border-radius:12px;font-weight:700;cursor:pointer}
+.btn-sec{background:#333;color:#fff;border:none;padding:12px 24px;border-radius:12px;font-weight:700;cursor:pointer}
+#modal{position:fixed;inset:0;background:rgba(0,0,0,0.9);display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px}
+#modal.hidden{display:none}
+.modal-content{background:var(--card);border:2px solid var(--accent);border-radius:16px;padding:24px;max-width:400px;text-align:center}
+.modal-botons{display:flex;gap:10px;margin-top:20px}
+.modal-botons button{flex:1;padding:12px;border:none;border-radius:8px;font-weight:700;cursor:pointer}
+.tip-emoji{font-size:48px;text-align:center;margin-bottom:12px}
+.tip-text{font-size:15px;line-height:1.5;text-align:center}
+#tip-counter{text-align:center;margin:12px 0;color:#999;font-size:12px}
 </style>
 </head>
 <body>
 
+<!-- INTRO -->
+<div id="intro-screen">
+  <h1 style="font-size:32px;margin-bottom:20px;">🚘 GasDrive DGT ES</h1>
+  <div id="intro-status" style="margin-bottom:20px;color:#00D9FF;">Cargando...</div>
+  <button id="btn-empezar" class="btn-sig" disabled>CARGANDO</button>
+</div>
+
+<!-- APP -->
+<div id="app">
 <header>
   <h1 id="app-titol">🚘 GasDrive DGT ES</h1>
   <div id="motivacion">Cargando datos...</div>
@@ -101,7 +112,6 @@ h1{font-size:24px;font-weight:900;letter-spacing:1.5px;margin-bottom:3px}
       <button class="sub-tab-btn" onclick="cambiarSubTab(event,'test','mecanica')">⚙️ Mecánica</button>
       <button class="sub-tab-btn" onclick="cambiarSubTab(event,'test','auxilios')">🚑 Auxilios</button>
       <button class="sub-tab-btn" onclick="cambiarSubTab(event,'test','medioambiente')">♻️ MedioAmb</button>
-      <button class="sub-tab-btn" onclick="cambiarSubTab(event,'test','situaciones')">🚗 Situaciones</button>
     </div>
 
     <div id="test-senales" class="sub-content active">
@@ -109,12 +119,10 @@ h1{font-size:24px;font-weight:900;letter-spacing:1.5px;margin-bottom:3px}
         <h2>🚦 SEÑALES DE TRÁFICO</h2>
         <div class="stats"><div>Aciertos: <span id="test-senales-aciertos">0</span></div><div>Racha: <span id="test-senales-racha">0</span>🔥</div><div>Score: <span id="test-senales-score">0</span></div></div>
         <div class="progress-bar"><div class="progress-fill" id="test-senales-progress"></div></div>
-        <div id="test-senales-imagen"></div>
+        <div id="test-senales-imagen" class="placeholder"></div>
         <div class="pregunta" id="test-senales-pregunta">Cargando...</div>
         <div id="test-senales-opciones"></div>
-        <div class="pista" id="test-senales-pista"></div>
         <div class="feedback" id="test-senales-feedback"></div>
-        <button class="btn-pista" onclick="mostrarPista('senales')">💡 IRIS: Pista -5 monedas</button>
         <button class="btn-sig" id="btn-sig-test-senales" onclick="siguienteTest(event,'senales')" disabled>SIGUIENTE</button>
       </div>
     </div>
@@ -124,11 +132,10 @@ h1{font-size:24px;font-weight:900;letter-spacing:1.5px;margin-bottom:3px}
         <h2>📋 NORMAS Y VELOCIDADES</h2>
         <div class="stats"><div>Aciertos: <span id="test-normas-aciertos">0</span></div><div>Racha: <span id="test-normas-racha">0</span>🔥</div><div>Score: <span id="test-normas-score">0</span></div></div>
         <div class="progress-bar"><div class="progress-fill" id="test-normas-progress"></div></div>
+        <div id="test-normas-imagen" class="placeholder"></div>
         <div class="pregunta" id="test-normas-pregunta"></div>
         <div id="test-normas-opciones"></div>
-        <div class="pista" id="test-normas-pista"></div>
         <div class="feedback" id="test-normas-feedback"></div>
-        <button class="btn-pista" onclick="mostrarPista('normas')">💡 IRIS: Pista -5 monedas</button>
         <button class="btn-sig" id="btn-sig-test-normas" onclick="siguienteTest(event,'normas')" disabled>SIGUIENTE</button>
       </div>
     </div>
@@ -138,11 +145,10 @@ h1{font-size:24px;font-weight:900;letter-spacing:1.5px;margin-bottom:3px}
         <h2>⚙️ MECÁNICA BÁSICA</h2>
         <div class="stats"><div>Aciertos: <span id="test-mecanica-aciertos">0</span></div><div>Racha: <span id="test-mecanica-racha">0</span>🔥</div><div>Score: <span id="test-mecanica-score">0</span></div></div>
         <div class="progress-bar"><div class="progress-fill" id="test-mecanica-progress"></div></div>
+        <div id="test-mecanica-imagen" class="placeholder"></div>
         <div class="pregunta" id="test-mecanica-pregunta"></div>
         <div id="test-mecanica-opciones"></div>
-        <div class="pista" id="test-mecanica-pista"></div>
         <div class="feedback" id="test-mecanica-feedback"></div>
-        <button class="btn-pista" onclick="mostrarPista('mecanica')">💡 IRIS: Pista -5 monedas</button>
         <button class="btn-sig" id="btn-sig-test-mecanica" onclick="siguienteTest(event,'mecanica')" disabled>SIGUIENTE</button>
       </div>
     </div>
@@ -152,11 +158,10 @@ h1{font-size:24px;font-weight:900;letter-spacing:1.5px;margin-bottom:3px}
         <h2>🚑 PRIMEROS AUXILIOS</h2>
         <div class="stats"><div>Aciertos: <span id="test-auxilios-aciertos">0</span></div><div>Racha: <span id="test-auxilios-racha">0</span>🔥</div><div>Score: <span id="test-auxilios-score">0</span></div></div>
         <div class="progress-bar"><div class="progress-fill" id="test-auxilios-progress"></div></div>
+        <div id="test-auxilios-imagen" class="placeholder"></div>
         <div class="pregunta" id="test-auxilios-pregunta"></div>
         <div id="test-auxilios-opciones"></div>
-        <div class="pista" id="test-auxilios-pista"></div>
         <div class="feedback" id="test-auxilios-feedback"></div>
-        <button class="btn-pista" onclick="mostrarPista('auxilios')">💡 IRIS: Pista -5 monedas</button>
         <button class="btn-sig" id="btn-sig-test-auxilios" onclick="siguienteTest(event,'auxilios')" disabled>SIGUIENTE</button>
       </div>
     </div>
@@ -166,26 +171,11 @@ h1{font-size:24px;font-weight:900;letter-spacing:1.5px;margin-bottom:3px}
         <h2>♻️ MEDIO AMBIENTE</h2>
         <div class="stats"><div>Aciertos: <span id="test-medioambiente-aciertos">0</span></div><div>Racha: <span id="test-medioambiente-racha">0</span>🔥</div><div>Score: <span id="test-medioambiente-score">0</span></div></div>
         <div class="progress-bar"><div class="progress-fill" id="test-medioambiente-progress"></div></div>
+        <div id="test-medioambiente-imagen" class="placeholder"></div>
         <div class="pregunta" id="test-medioambiente-pregunta"></div>
         <div id="test-medioambiente-opciones"></div>
-        <div class="pista" id="test-medioambiente-pista"></div>
         <div class="feedback" id="test-medioambiente-feedback"></div>
-        <button class="btn-pista" onclick="mostrarPista('medioambiente')">💡 IRIS: Pista -5 monedas</button>
         <button class="btn-sig" id="btn-sig-test-medioambiente" onclick="siguienteTest(event,'medioambiente')" disabled>SIGUIENTE</button>
-      </div>
-    </div>
-
-    <div id="test-situaciones" class="sub-content">
-      <div class="card">
-        <h2>🚗 SITUACIONES REALES</h2>
-        <div class="stats"><div>Aciertos: <span id="test-situaciones-aciertos">0</span></div><div>Racha: <span id="test-situaciones-racha">0</span>🔥</div><div>Score: <span id="test-situaciones-score">0</span></div></div>
-        <div class="progress-bar"><div class="progress-fill" id="test-situaciones-progress"></div></div>
-        <div class="pregunta" id="test-situaciones-pregunta"></div>
-        <div id="test-situaciones-opciones"></div>
-        <div class="pista" id="test-situaciones-pista"></div>
-        <div class="feedback" id="test-situaciones-feedback"></div>
-        <button class="btn-pista" onclick="mostrarPista('situaciones')">💡 IRIS: Pista -5 monedas</button>
-        <button class="btn-sig" id="btn-sig-test-situaciones" onclick="siguienteTest(event,'situaciones')" disabled>SIGUIENTE</button>
       </div>
     </div>
   </div>
@@ -196,7 +186,7 @@ h1{font-size:24px;font-weight:900;letter-spacing:1.5px;margin-bottom:3px}
       <h2>📋 EXAMEN OFICIAL 30 PREGUNTAS</h2>
       <div class="stats"><div>Pregunta: <span id="examen-num">0</span>/30</div><div>Aciertos: <span id="examen-aciertos">0</span></div><div>Tiempo: <span id="examen-timer">30:00</span></div></div>
       <div class="progress-bar"><div class="progress-fill" id="examen-progress"></div></div>
-      <div id="examen-imagen"></div>
+      <div id="examen-imagen" class="placeholder"></div>
       <div class="pregunta" id="examen-pregunta">Pulsa Iniciar Examen</div>
       <div id="examen-opciones"></div>
       <button class="btn-sig" id="btn-iniciar-examen" onclick="iniciarExamen(event)">INICIAR EXAMEN</button>
@@ -205,18 +195,20 @@ h1{font-size:24px;font-weight:900;letter-spacing:1.5px;margin-bottom:3px}
     </div>
   </div>
 
-  <!-- CASOS - CON 4 SUB-TABS -->
+  <!-- CASOS - 4 SUB-TABS -->
   <div id="tab-situaciones" class="tab-content">
-    <div class="sub-tabs">
-      <button class="sub-tab-btn active" onclick="cambiarSubTab(event,'sit','clima')">🌧️ Clima</button>
-      <button class="sub-tab-btn" onclick="cambiarSubTab(event,'sit','urbano')">🏙️ Urbano</button>
-      <button class="sub-tab-btn" onclick="cambiarSubTab(event,'sit','carretera')">🛣️ Carretera</button>
-      <button class="sub-tab-btn" onclick="cambiarSubTab(event,'sit','emergencia')">🚨 Emergencia</button>
-    </div>
+    <div class="card">
+      <h2 id="sit-titulo">🌧️ CASOS REALES - CLIMA ADVERSO</h2>
+      <div id="lista-casos" class="lista-temas" style="margin-bottom:16px;"></div>
+      
+      <div class="sub-tabs">
+        <button class="sub-tab-btn active" onclick="cambiarCategoriaSit('clima')">🌧️ Clima</button>
+        <button class="sub-tab-btn" onclick="cambiarCategoriaSit('urbano')">🏙️ Urbano</button>
+        <button class="sub-tab-btn" onclick="cambiarCategoriaSit('carretera')">🛣️ Carretera</button>
+        <button class="sub-tab-btn" onclick="cambiarCategoriaSit('emergencia')">🚨 Emergencia</button>
+      </div>
 
-    <div id="sit-clima" class="sub-content active">
-      <div class="card">
-        <h2 id="sit-titulo">🌧️ CASOS REALES - CLIMA ADVERSO</h2>
+      <div id="sit-clima" class="sub-content active">
         <div class="stats">
           <div>Aciertos: <span id="sit-clima-aciertos">0</span></div>
           <div>Score: <span id="sit-clima-score">0</span></div>
@@ -227,11 +219,8 @@ h1{font-size:24px;font-weight:900;letter-spacing:1.5px;margin-bottom:3px}
         <div class="feedback" id="sit-clima-feedback"></div>
         <button class="btn-sig" id="btn-sig-sit-clima" onclick="siguienteSituacion(event,'clima')" disabled>SIGUIENTE</button>
       </div>
-    </div>
 
-    <div id="sit-urbano" class="sub-content">
-      <div class="card">
-        <h2>🏙️ CASOS REALES - URBANO</h2>
+      <div id="sit-urbano" class="sub-content">
         <div class="stats">
           <div>Aciertos: <span id="sit-urbano-aciertos">0</span></div>
           <div>Score: <span id="sit-urbano-score">0</span></div>
@@ -242,11 +231,8 @@ h1{font-size:24px;font-weight:900;letter-spacing:1.5px;margin-bottom:3px}
         <div class="feedback" id="sit-urbano-feedback"></div>
         <button class="btn-sig" id="btn-sig-sit-urbano" onclick="siguienteSituacion(event,'urbano')" disabled>SIGUIENTE</button>
       </div>
-    </div>
 
-    <div id="sit-carretera" class="sub-content">
-      <div class="card">
-        <h2>🛣️ CASOS REALES - CARRETERA</h2>
+      <div id="sit-carretera" class="sub-content">
         <div class="stats">
           <div>Aciertos: <span id="sit-carretera-aciertos">0</span></div>
           <div>Score: <span id="sit-carretera-score">0</span></div>
@@ -257,11 +243,8 @@ h1{font-size:24px;font-weight:900;letter-spacing:1.5px;margin-bottom:3px}
         <div class="feedback" id="sit-carretera-feedback"></div>
         <button class="btn-sig" id="btn-sig-sit-carretera" onclick="siguienteSituacion(event,'carretera')" disabled>SIGUIENTE</button>
       </div>
-    </div>
 
-    <div id="sit-emergencia" class="sub-content">
-      <div class="card">
-        <h2>🚨 CASOS REALES - EMERGENCIA</h2>
+      <div id="sit-emergencia" class="sub-content">
         <div class="stats">
           <div>Aciertos: <span id="sit-emergencia-aciertos">0</span></div>
           <div>Score: <span id="sit-emergencia-score">0</span></div>
@@ -300,8 +283,13 @@ h1{font-size:24px;font-weight:900;letter-spacing:1.5px;margin-bottom:3px}
   <!-- TIPS -->
   <div id="tab-tips" class="tab-content">
     <div class="card">
-      <h2>💡 TIPS Y TRUCOS</h2>
-      <div id="tips-lista" class="lista-temas"></div>
+      <h2>💡 TIPS Y TRUCOS DGT</h2>
+      <div id="tip-content"></div>
+      <div id="tip-counter">0 / 0</div>
+      <div style="display:flex;gap:10px;margin-top:12px;">
+        <button class="btn-sec" onclick="prevTip(event)" style="flex:1;">← Anterior</button>
+        <button class="btn" onclick="nextTip(event)" style="flex:1;">Siguiente →</button>
+      </div>
     </div>
   </div>
 
@@ -356,12 +344,6 @@ h1{font-size:24px;font-weight:900;letter-spacing:1.5px;margin-bottom:3px}
   </div>
 </div>
 
-<script src="./data/senales_svg.js"></script>
-<script type="module">
-import * as App from './app.js';
-Object.assign(window, App);
-App.iniciarCarga();
-</script>
-
+<script src="app.js"></script>
 </body>
 </html>
