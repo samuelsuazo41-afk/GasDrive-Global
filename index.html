@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>GasDrive DGT ES 2026</title>
-<meta name="description" content="Aprende el carnet DGT jugando">
 <meta name="theme-color" content="#0a0a0a">
 <link rel="manifest" href="./manifest.json">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -42,7 +41,6 @@ h1{font-size:24px;font-weight:900;letter-spacing:1.5px;margin-bottom:3px}
 @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
 @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-10px)}75%{transform:translateX(10px)}}
 @keyframes bounceIn{0%{transform:translateY(-50%) scale(0)}50%{transform:translateY(-50%) scale(1.2)}100%{transform:translateY(-50%) scale(1)}}
-@keyframes slideUp{from{transform:translateX(-50%) translateY(100px);opacity:0}to{transform:translateX(-50%) translateY(0);opacity:1}}
 .btn-sig{background:linear-gradient(180deg,#4a4a4a 0%,#2a2a2a 100%);color:#fff;border:none;padding:14px;width:100%;font-size:15px;font-weight:700;margin-top:10px;border-radius:10px;cursor:pointer}
 .btn-sig:disabled{background:#333;color:#666;cursor:not-allowed}
 .stats{display:flex;justify-content:space-between;background:#0f0f0f;padding:9px;border-radius:7px;margin-bottom:10px;font-size:12px}
@@ -72,11 +70,6 @@ h1{font-size:24px;font-weight:900;letter-spacing:1.5px;margin-bottom:3px}
 .btn-buy{background:var(--accent);color:#000;border:none;padding:6px 10px;border-radius:6px;font-size:11px;font-weight:700;margin-top:6px;cursor:pointer;width:100%}
 .btn{background:var(--accent);color:#000;border:none;padding:12px 24px;border-radius:12px;font-weight:700;cursor:pointer}
 .btn-sec{background:#333;color:#fff;border:none;padding:12px 24px;border-radius:12px;font-weight:700;cursor:pointer}
-#modal{position:fixed;inset:0;background:rgba(0,0,0,0.9);display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px}
-#modal.hidden{display:none}
-.modal-content{background:var(--card);border:2px solid var(--accent);border-radius:16px;padding:24px;max-width:400px;text-align:center}
-.modal-botons{display:flex;gap:10px;margin-top:20px}
-.modal-botons button{flex:1;padding:12px;border:none;border-radius:8px;font-weight:700;cursor:pointer}
 .tip-emoji{font-size:48px;text-align:center;margin-bottom:12px}
 .tip-text{font-size:15px;line-height:1.5;text-align:center}
 #tip-counter{text-align:center;margin:12px 0;color:#999;font-size:12px}
@@ -84,14 +77,12 @@ h1{font-size:24px;font-weight:900;letter-spacing:1.5px;margin-bottom:3px}
 </head>
 <body>
 
-<!-- INTRO -->
 <div id="intro-screen">
   <h1 style="font-size:32px;margin-bottom:20px;">🚘 GasDrive DGT ES</h1>
   <div id="intro-status" style="margin-bottom:20px;color:#00D9FF;">Cargando...</div>
   <button id="btn-empezar" class="btn-sig" disabled>CARGANDO</button>
 </div>
 
-<!-- APP -->
 <div id="app">
 <header>
   <h1 id="app-titol">🚘 GasDrive DGT ES</h1>
@@ -104,7 +95,6 @@ h1{font-size:24px;font-weight:900;letter-spacing:1.5px;margin-bottom:3px}
 </div>
 
 <div class="container">
-  <!-- TEST -->
   <div id="tab-test" class="tab-content active">
     <div class="sub-tabs">
       <button class="sub-tab-btn active" onclick="cambiarSubTab(event,'test','senales')">🚦 Señales</button>
@@ -180,7 +170,6 @@ h1{font-size:24px;font-weight:900;letter-spacing:1.5px;margin-bottom:3px}
     </div>
   </div>
 
-  <!-- EXAMEN -->
   <div id="tab-examen" class="tab-content">
     <div class="card">
       <h2>📋 EXAMEN OFICIAL 30 PREGUNTAS</h2>
@@ -195,7 +184,6 @@ h1{font-size:24px;font-weight:900;letter-spacing:1.5px;margin-bottom:3px}
     </div>
   </div>
 
-  <!-- CASOS - 4 SUB-TABS -->
   <div id="tab-situaciones" class="tab-content">
     <div class="card">
       <h2 id="sit-titulo">🌧️ CASOS REALES - CLIMA ADVERSO</h2>
@@ -258,7 +246,6 @@ h1{font-size:24px;font-weight:900;letter-spacing:1.5px;margin-bottom:3px}
     </div>
   </div>
 
-  <!-- GARAJE -->
   <div id="tab-garage" class="tab-content">
     <div class="card">
       <h2>🏎️ MI GARAJE</h2>
@@ -271,7 +258,6 @@ h1{font-size:24px;font-weight:900;letter-spacing:1.5px;margin-bottom:3px}
     </div>
   </div>
 
-  <!-- TIENDA -->
   <div id="tab-tienda" class="tab-content">
     <div class="card">
       <h2>🛒 TIENDA</h2>
@@ -280,7 +266,6 @@ h1{font-size:24px;font-weight:900;letter-spacing:1.5px;margin-bottom:3px}
     </div>
   </div>
 
-  <!-- TIPS -->
   <div id="tab-tips" class="tab-content">
     <div class="card">
       <h2>💡 TIPS Y TRUCOS DGT</h2>
@@ -293,7 +278,6 @@ h1{font-size:24px;font-weight:900;letter-spacing:1.5px;margin-bottom:3px}
     </div>
   </div>
 
-  <!-- TEMARIOS -->
   <div id="tab-temario" class="tab-content">
     <div class="card">
       <h2>📚 TEMARIOS DGT</h2>
@@ -334,22 +318,6 @@ h1{font-size:24px;font-weight:900;letter-spacing:1.5px;margin-bottom:3px}
   </div>
 </nav>
 
-<div id="modal" class="modal hidden">
-  <div class="modal-content">
-    <p id="modalText"></p>
-    <div class="modal-botons">
-      <button class="btn-sec" onclick="tancarModal()">Cancelar</button>
-      <button class="btn" onclick="confirmarAccio()">Aceptar</button>
-    </div>
-  </div>
-</div>
-
 <script src="app.js"></script>
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    if(typeof iniciarCarga === 'function') iniciarCarga();
-    else console.error('iniciarCarga no existe en app.js');
-  });
-</script>
 </body>
 </html>
