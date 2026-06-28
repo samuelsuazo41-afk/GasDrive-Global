@@ -76,6 +76,8 @@ h1{font-size:24px;font-weight:900;letter-spacing:1.5px;margin-bottom:3px}
 .tema-item:hover{border-color:var(--accent)}
 .grid-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .card-mini{background:#222;border:1px solid #333;padding:12px;border-radius:10px;text-align:center;font-size:13px}
+.locked{opacity:0.4}
+.btn-buy{background:var(--accent);color:#000;border:none;padding:6px 10px;border-radius:6px;font-size:11px;font-weight:700;margin-top:6px;cursor:pointer;width:100%}
 </style>
 </head>
 <body>
@@ -203,12 +205,73 @@ h1{font-size:24px;font-weight:900;letter-spacing:1.5px;margin-bottom:3px}
     </div>
   </div>
 
-  <!-- CASOS -->
+  <!-- CASOS - CON 4 SUB-TABS -->
   <div id="tab-situaciones" class="tab-content">
-    <div class="card">
-      <h2>🚗 CASOS PRÁCTICOS</h2>
-      <p style="text-align:center;font-size:14px;color:#999;margin-bottom:12px">Resuelve situaciones reales paso a paso</p>
-      <div class="lista-temas" id="lista-casos"></div>
+    <div class="sub-tabs">
+      <button class="sub-tab-btn active" onclick="cambiarSubTab(event,'sit','clima')">🌧️ Clima</button>
+      <button class="sub-tab-btn" onclick="cambiarSubTab(event,'sit','urbano')">🏙️ Urbano</button>
+      <button class="sub-tab-btn" onclick="cambiarSubTab(event,'sit','carretera')">🛣️ Carretera</button>
+      <button class="sub-tab-btn" onclick="cambiarSubTab(event,'sit','emergencia')">🚨 Emergencia</button>
+    </div>
+
+    <div id="sit-clima" class="sub-content active">
+      <div class="card">
+        <h2 id="sit-titulo">🌧️ CASOS REALES - CLIMA ADVERSO</h2>
+        <div class="stats">
+          <div>Aciertos: <span id="sit-clima-aciertos">0</span></div>
+          <div>Score: <span id="sit-clima-score">0</span></div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="sit-clima-progress"></div></div>
+        <div class="pregunta" id="sit-clima-pregunta">Cargando...</div>
+        <div id="sit-clima-opciones"></div>
+        <div class="feedback" id="sit-clima-feedback"></div>
+        <button class="btn-sig" id="btn-sig-sit-clima" onclick="siguienteSituacion(event,'clima')" disabled>SIGUIENTE</button>
+      </div>
+    </div>
+
+    <div id="sit-urbano" class="sub-content">
+      <div class="card">
+        <h2>🏙️ CASOS REALES - URBANO</h2>
+        <div class="stats">
+          <div>Aciertos: <span id="sit-urbano-aciertos">0</span></div>
+          <div>Score: <span id="sit-urbano-score">0</span></div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="sit-urbano-progress"></div></div>
+        <div class="pregunta" id="sit-urbano-pregunta"></div>
+        <div id="sit-urbano-opciones"></div>
+        <div class="feedback" id="sit-urbano-feedback"></div>
+        <button class="btn-sig" id="btn-sig-sit-urbano" onclick="siguienteSituacion(event,'urbano')" disabled>SIGUIENTE</button>
+      </div>
+    </div>
+
+    <div id="sit-carretera" class="sub-content">
+      <div class="card">
+        <h2>🛣️ CASOS REALES - CARRETERA</h2>
+        <div class="stats">
+          <div>Aciertos: <span id="sit-carretera-aciertos">0</span></div>
+          <div>Score: <span id="sit-carretera-score">0</span></div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="sit-carretera-progress"></div></div>
+        <div class="pregunta" id="sit-carretera-pregunta"></div>
+        <div id="sit-carretera-opciones"></div>
+        <div class="feedback" id="sit-carretera-feedback"></div>
+        <button class="btn-sig" id="btn-sig-sit-carretera" onclick="siguienteSituacion(event,'carretera')" disabled>SIGUIENTE</button>
+      </div>
+    </div>
+
+    <div id="sit-emergencia" class="sub-content">
+      <div class="card">
+        <h2>🚨 CASOS REALES - EMERGENCIA</h2>
+        <div class="stats">
+          <div>Aciertos: <span id="sit-emergencia-aciertos">0</span></div>
+          <div>Score: <span id="sit-emergencia-score">0</span></div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="sit-emergencia-progress"></div></div>
+        <div class="pregunta" id="sit-emergencia-pregunta"></div>
+        <div id="sit-emergencia-opciones"></div>
+        <div class="feedback" id="sit-emergencia-feedback"></div>
+        <button class="btn-sig" id="btn-sig-sit-emergencia" onclick="siguienteSituacion(event,'emergencia')" disabled>SIGUIENTE</button>
+      </div>
     </div>
   </div>
 
@@ -216,7 +279,11 @@ h1{font-size:24px;font-weight:900;letter-spacing:1.5px;margin-bottom:3px}
   <div id="tab-garage" class="tab-content">
     <div class="card">
       <h2>🏎️ MI GARAJE</h2>
-      <div class="stats"><div>Nivel: <span id="garage-nivel">1</span></div><div>XP: <span id="garage-xp">0</span></div></div>
+      <div class="stats">
+        <div>Nivel: <span id="garage-nivel">1</span></div>
+        <div>XP: <span id="garage-xp">0</span></div>
+        <div id="garage-score">🏎️ 90 CV</div>
+      </div>
       <div id="garage-coches" class="grid-cards"></div>
     </div>
   </div>
@@ -297,4 +364,4 @@ App.iniciarCarga();
 </script>
 
 </body>
-</html> 
+</html>
