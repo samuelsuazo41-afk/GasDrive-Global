@@ -1148,56 +1148,49 @@ const EMOJI_TIENDA = [
 ];
 
 
+// ========= DATOS - DEBEN IR LO PRIMERO =========
+const DATOS = {
+  senales: [ /* tus 630 preguntas aquí */ ],
+  normas: [ /*... */ ],
+  mecanica: [ /*... */ ],
+  auxilios: [ /*... */ ],
+  medioambiente: [ /*... */ ],
+  situaciones: [ /*... */ ]
+};
 
-// ========= BLOQUE LÓGICA - V10.5.2 ES SIN PISTAS =========
+const SENALES_SVG = { /* tus SVGs */ };
+const TIPS = [ /* tus tips */ ];
+const COCHES = [ /* tus coches */ ];
+const ACCESORIOS = [ /* tus accesorios */ ];
+const EMOJI_TIENDA = [ /* tus emojis */ ];
+const TEMARIO = [ /* tus temarios */ ];
+
+// ========= BLOQUE LÓGICA - V10.5.2 ES ARREGLADA =========
 const EMOJIS_ACIERTO = ['🚀','💎','👑','🔥','💯','⚡','🏆','🦄','🤑','✅','💪','😎','🎯','💥','🌟','🎉'];
 const EMOJIS_FALLO = ['❌','💀','😭','⛔','💔','😵','🤦','🚫','💩','🤡','💥','😤'];
 
-let DATOS_LISTOS = false;
-
-// ===== CARGA - DATOS YA INTEGRADOS EN app.js =====
-function iniciarCarga() {
-  const btn = document.getElementById('btn-empezar');
-  const status = document.getElementById('intro-status');
-  
-  if (typeof DATOS === 'undefined') {
-    if(status) status.textContent = '❌ Error: No se encontró DATOS';
-    return;
-  }
-
-  const cats = ['senales', 'normas', 'mecanica', 'auxilios', 'medioambiente'];
-  let cargadas = 0;
-  
-  cats.forEach(cat => {
-    if (DATOS[cat] && DATOS[cat].length > 0) cargadas++;
-  });
-
-  if (cargadas === 0) {
-    if(status) status.textContent = '❌ Error: Bancos de preguntas vacíos';
-    if(btn) {
-      btn.textContent = 'ERROR';
-      btn.disabled = true;
-    }
-  } else {
-    DATOS_LISTOS = true;
-    if(status) status.textContent = cargadas === 5? '✅ Todo listo' : `⚠️ ${cargadas}/5 listas`;
-    if(btn) {
-      btn.textContent = 'EMPEZAR';
-      btn.disabled = false;
-      btn.onclick = entrarApp;
-    } else {
-      entrarApp();
-    }
-  }
+// ===== INTRO INYECTADA COMO CAT =====
+function mostrarIntro(){
+  document.body.insertAdjacentHTML('afterbegin', `
+    <div id="intro-screen" style="position:fixed;top:0;left:0;right:0;bottom:0;background:linear-gradient(135deg,#1a1a2e,#16213e);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-align:center;padding:20px">
+      <div style="font-size:64px;margin-bottom:20px">🚗</div>
+      <h1 style="font-size:32px;margin:0 0 10px">GasDrive DGT ES 2026</h1>
+      <p style="font-size:18px;opacity:0.8;margin:0 0 10px">Aprende el carnet en 15 min al día</p>
+      <p style="font-size:16px;opacity:0.9;margin:0 0 30px">📚 Temarios oficiales DGT para estudiar cuando quieras</p>
+      <div style="text-align:left;font-size:16px;margin-bottom:40px;line-height:2">
+        <div>💰 Gana coins respondiendo bien</div>
+        <div>🏎️ Compra supercoches en el Garaje</div>
+        <div>📚 630 preguntas DGT reales</div>
+        <div>📖 Temarios completos para repasar</div>
+      </div>
+      <button onclick="cerrarIntro()" style="background:linear-gradient(135deg,#ff8c00,#ff2d55);border:none;color:#fff;padding:16px 48px;border-radius:12px;font-size:18px;font-weight:bold;cursor:pointer">EMPEZAR</button>
+    </div>
+  `);
 }
 
-function entrarApp() {
-  if (!DATOS_LISTOS) return;
-  const intro = document.getElementById('intro-screen');
-  const app = document.getElementById('app');
-  if(intro) intro.style.display = 'none';
-  if(app) app.style.display = 'block';
-  init();
+function cerrarIntro(){
+  document.getElementById('intro-screen').remove();
+  document.getElementById('app').style.display = 'block';
 }
 
 // ===== ESTADO GLOBAL =====
@@ -1234,7 +1227,27 @@ let estado = {
   }
 };
 
-// ===== HELPERS - TODO INTEGRADO =====
+// ===== INIT ROBUSTO COMO CAT =====
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
+
+function init() {
+  console.log("GasDrive V10.5.2 ES - Datos integrados, PDFs en raíz");
+  mostrarIntro();
+  actualizarCoins();
+  cargarPregunta('senales');
+  cargarPregunta('normas');
+  cargarPregunta('mecanica');
+  cargarPregunta('auxilios');
+  cargarPregunta('medioambiente');
+  cargarCasos();
+  actualizarMensajeMotivacional();
+}
+
+// ===== HELPERS =====
 function getPreguntas(cat) {
   return DATOS[cat] || [];
 }
@@ -1257,19 +1270,6 @@ function barajarArray(arr) {
     [a[i], a[j]] = [a[j], a[i]];
   }
   return a;
-}
-
-// ===== INIT =====
-function init() {
-  console.log("GasDrive V10.5.2 ES - Datos integrados, PDFs en raíz");
-  actualizarCoins();
-  cargarPregunta('senales');
-  cargarPregunta('normas');
-  cargarPregunta('mecanica');
-  cargarPregunta('auxilios');
-  cargarPregunta('medioambiente');
-  cargarCasos();
-  actualizarMensajeMotivacional();
 }
 
 function guardar() {
@@ -1530,11 +1530,11 @@ function siguienteSituacion(e, cat) {
 // ===== EXAMEN OFICIAL =====
 function iniciarExamen(e) {
   const todas = [
-  ...getPreguntas('senales'),
-  ...getPreguntas('normas'),
-  ...getPreguntas('mecanica'),
-  ...getPreguntas('auxilios'),
-  ...getPreguntas('medioambiente')
+ ...getPreguntas('senales'),
+ ...getPreguntas('normas'),
+ ...getPreguntas('mecanica'),
+ ...getPreguntas('auxilios'),
+ ...getPreguntas('medioambiente')
   ];
 
   if(todas.length < 30) {
@@ -1942,10 +1942,25 @@ function mostrarModal(texto) {
   document.body.appendChild(modal);
 }
 
-// ===== INICIO AUTOMÁTICO =====
-document.addEventListener('DOMContentLoaded', () => {
-  iniciarCarga();
-});
+// ===== INIT ROBUSTO COMO CAT V8.2 =====
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
+
+function init() {
+  console.log("GasDrive V10.5.2 ES - Arquitectura CAT aplicada");
+  mostrarIntro();
+  actualizarCoins();
+  cargarPregunta('senales');
+  cargarPregunta('normas');
+  cargarPregunta('mecanica');
+  cargarPregunta('auxilios');
+  cargarPregunta('medioambiente');
+  cargarCasos();
+  actualizarMensajeMotivacional();
+}
 
 // ===== EXPORTS GLOBALES PARA HTML onclick =====
 window.cambiarTab = cambiarTab;
@@ -1963,9 +1978,18 @@ window.abrirPDF = abrirPDF;
 window.cerrarPDF = cerrarPDF;
 window.comprarCoche = comprarCoche;
 window.comprarAccesorios = comprarAccesorios;
-window.entrarApp = entrarApp;
 window.cargarPregunta = cargarPregunta;
 window.responderTest = responderTest;
 window.responderSituacion = responderSituacion;
 window.responderExamen = responderExamen;
+window.cerrarIntro = cerrarIntro;
+
+// ===== SERVICE WORKER REGISTRO =====
+if('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+.then(reg => console.log('SW registrado'))
+.catch(err => console.log('SW error:', err));
+  });
+}
 // === FIN BLOQUE LÓGICA ===
