@@ -1165,7 +1165,7 @@ const ACCESORIOS = [ /* tus accesorios */ ];
 const EMOJI_TIENDA = [ /* tus emojis */ ];
 const TEMARIO = [ /* tus temarios */ ];
 
-// ========= BLOQUE LÓGICA - V10.5.2 ES ARREGLADA =========
+// ========= BLOQUE LÓGICA - V10.5.3 ES ARREGLADA =========
 const EMOJIS_ACIERTO = ['🚀','💎','👑','🔥','💯','⚡','🏆','🦄','🤑','✅','💪','😎','🎯','💥','🌟','🎉'];
 const EMOJIS_FALLO = ['❌','💀','😭','⛔','💔','😵','🤦','🚫','💩','🤡','💥','😤'];
 
