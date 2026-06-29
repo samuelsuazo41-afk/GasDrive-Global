@@ -1,4 +1,4 @@
-const CACHE = 'gasdrive-v9.6.2'; // MISMA QUE app.js para forzar update
+const CACHE = 'gasdrive-v10.5.2'; // MISMA QUE app.js para forzar update
 const FILES = [
   './',
   './index.html',
