@@ -1,4 +1,4 @@
-// ========== GASDRIVE DGT V10.5.1 ES - BLOQUE DATOS ==========
+// ========== GASDRIVE DGT V10.5.2 ES - BLOQUE DATOS ==========
 // === INICIO BLOQUE DATOS - NO TOCAR AL EDITAR LÓGICA ===
 // Aquí van TODOS tus bancos. Solo los pegas 1 vez y te olvidas.
 
